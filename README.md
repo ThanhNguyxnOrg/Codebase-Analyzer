@@ -2,7 +2,7 @@
 
 # 🧠 Codebase Analyzer
 
-### ⚡ Local Source Code Analysis Tool with Desktop UI & C++ OOP Core
+### ⚡ Local Source Code Analyzer with Desktop UI & C++ OOP Core
 
 <p>
   <img src="https://img.shields.io/badge/C++-23-blue?style=for-the-badge&logo=cplusplus" />
@@ -13,7 +13,15 @@
 </p>
 
 <p>
-  <b>Analyze local repositories, count real source lines, detect comments/blank lines, and visualize project structure through a clean desktop interface.</b>
+  <b>Scan local source folders, inspect language usage, count real code/comment/blank lines, and export reproducible reports.</b>
+</p>
+
+<p>
+  <a href="https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest">📦 Download Latest Release</a>
+  ·
+  <a href="https://github.com/ThanhNguyn/Codebase-Analyzer/actions">🤖 GitHub Actions</a>
+  ·
+  <a href="#-getting-started">🚀 Getting Started</a>
 </p>
 
 </div>
@@ -22,18 +30,16 @@
 
 ## 📌 Overview
 
-**Codebase Analyzer** is a local source code analysis application built for an Object-Oriented Programming project.
+**Codebase Analyzer** is an Object-Oriented Programming project designed to analyze local source code repositories.
 
-The project started as a **C++ CLI analyzer** and is now extended with a **desktop UI layer** to make the workflow easier to use, easier to demo, and more visually professional.
+The project includes:
 
-It helps users quickly understand:
+- ⚙️ A **C++23 CLI analyzer core** built with OOP architecture
+- 🖥️ A **desktop UI prototype** built with Electron, React, TypeScript, and Vite
+- 📝 A Markdown report workflow for storing analysis results
+- 🤖 GitHub Actions workflow support for cross-platform release builds
 
-- 📁 How many source files exist in a project
-- 🧾 How many lines are actual code
-- 💬 How many lines are comments
-- ⬜ How many lines are blank
-- 🌐 Which programming languages are used
-- 📊 How the codebase is distributed across files and languages
+The application helps users quickly understand the structure and scale of a codebase without manually opening every file.
 
 ---
 
@@ -41,14 +47,268 @@ It helps users quickly understand:
 
 | Feature | Description |
 |---|---|
-| 📂 **Local Folder Selection** | Users must choose a real local project folder before analysis starts |
-| 🔍 **Recursive Directory Scan** | Traverse nested folders and detect valid source files automatically |
-| 🚫 **Noise Folder Filtering** | Skip folders such as `.git`, `build`, `node_modules`, `dist`, and generated outputs |
-| 🧠 **Language-aware Analysis** | Detect and analyze source files based on file extensions |
-| 💬 **Comment Detection** | Count single-line and block comments depending on language syntax |
-| 📊 **Dashboard UI** | Display project statistics through a clean desktop interface |
-| 📝 **Markdown Report** | Export summarized analysis into `codebase_report.md` |
-| 🧩 **OOP-based Core Design** | Apply abstraction, inheritance, polymorphism, and encapsulation in the analyzer core |
+| 📂 **Local Folder Selection** | Choose a real local project folder before analysis starts |
+| 🔍 **Recursive Directory Scanning** | Traverse nested folders and detect valid source files automatically |
+| 🚫 **Noise Folder Filtering** | Ignore folders such as `.git`, `build`, `release`, `node_modules`, `dist`, `venv`, and generated outputs |
+| 🧠 **Language-aware Analysis** | Detect files by extension and apply language-specific parsing rules |
+| 💬 **Comment Detection** | Count single-line and multi-line comments depending on syntax |
+| ⬜ **Blank Line Detection** | Separate blank lines from executable code |
+| 📊 **Desktop Dashboard** | Display analysis results through a modern local UI |
+| 📝 **Markdown Report Export** | Generate `codebase_report.md` for documentation or submission |
+| 🧩 **OOP Architecture** | Demonstrate abstraction, inheritance, polymorphism, and encapsulation |
+
+---
+
+## 📦 Download & Installation
+
+You can use **Codebase Analyzer** in two ways:
+
+| Mode | Best for | Interface |
+|---|---|---|
+| 🖥️ **Desktop UI App** | Normal users, demos, presentations | Visual desktop app |
+| ⚙️ **CLI Mode** | Developers, terminal usage, C++ core testing | Command line |
+
+---
+
+## 🖥️ Option 1 — Use Desktop UI App
+
+### ✅ Recommended for
+
+- Presenting the project in class
+- Selecting folders visually
+- Viewing analysis results in a dashboard-style interface
+- Using the application without typing CLI commands
+
+### ⬇️ Download
+
+Download the latest desktop build here:
+
+👉 **[Download Latest Release](https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest)**
+
+You can also view all published versions here:
+
+👉 **[All Releases](https://github.com/ThanhNguyn/Codebase-Analyzer/releases)**
+
+---
+
+### 🪟 Windows Installation
+
+1. Open the **Latest Release** page:
+
+```txt
+https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest
+```
+
+2. Download the Windows build. The file name may look like one of these:
+
+```txt
+Codebase-Analyzer-Setup.exe
+```
+
+or:
+
+```txt
+Codebase-Analyzer-win-unpacked.zip
+```
+
+3. If you downloaded the installer:
+
+```txt
+Double-click the .exe file → follow the installer steps → open Codebase Analyzer
+```
+
+4. If you downloaded the ZIP version:
+
+```txt
+Extract the ZIP file → open the extracted folder → run Codebase Analyzer.exe
+```
+
+5. In the app, click:
+
+```txt
+Choose Local Folder
+```
+
+6. Select the project folder you want to analyze.
+
+7. View results in the desktop dashboard and export the report if needed.
+
+---
+
+### 🐧 Linux Installation
+
+Linux builds may be available through the release page or GitHub Actions artifacts.
+
+1. Open:
+
+```txt
+https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest
+```
+
+2. Download the Linux artifact if available, for example:
+
+```txt
+Codebase-Analyzer.AppImage
+```
+
+3. Give it execution permission:
+
+```bash
+chmod +x Codebase-Analyzer.AppImage
+```
+
+4. Run it:
+
+```bash
+./Codebase-Analyzer.AppImage
+```
+
+> ⚠️ Linux builds are generated automatically when configured in GitHub Actions. Runtime behavior should be verified on an actual Linux machine.
+
+---
+
+### 🍎 macOS Installation
+
+macOS builds may be available through the release page or GitHub Actions artifacts.
+
+1. Open:
+
+```txt
+https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest
+```
+
+2. Download the macOS build if available, for example:
+
+```txt
+Codebase-Analyzer.dmg
+```
+
+3. Open the `.dmg` file.
+
+4. Drag the application into the `Applications` folder.
+
+5. Launch the app and choose a local folder to analyze.
+
+> ⚠️ macOS Gatekeeper may warn about unsigned applications. This is normal for student projects without a paid Apple Developer signing certificate.
+
+---
+
+### 📌 Desktop UI Notes
+
+- The app requires the user to choose a real local folder before analysis.
+- It does not automatically analyze a bundled sample project.
+- The UI is designed for local static code analysis and project presentation.
+- Windows is the primary manually tested platform.
+
+---
+
+## ⚙️ Option 2 — Use CLI Mode Without UI
+
+### ✅ Recommended for
+
+- Demonstrating the C++ OOP analyzer core
+- Terminal-based analysis
+- Lightweight testing
+- Debugging analyzer logic
+- Running without Electron/React UI
+
+---
+
+### 🛠️ Requirements
+
+Make sure these tools are installed:
+
+- 🧩 Git
+- ⚙️ CMake `3.20+`
+- 🧠 C++ compiler with C++23 support
+
+Examples:
+
+| OS | Recommended compiler |
+|---|---|
+| 🪟 Windows | MSVC / MinGW |
+| 🐧 Linux | GCC / Clang |
+| 🍎 macOS | Apple Clang |
+
+---
+
+### 📥 Clone Repository
+
+```bash
+git clone https://github.com/ThanhNguyn/Codebase-Analyzer.git
+cd Codebase-Analyzer
+```
+
+---
+
+### 🧱 Build CLI Core
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+---
+
+### ▶️ Run CLI Analyzer
+
+Analyze the current folder:
+
+```bash
+./build/codebase-analyzer .
+```
+
+Analyze a specific folder:
+
+```bash
+./build/codebase-analyzer path/to/your/project
+```
+
+On Windows, the executable may be inside `Debug` or `Release` depending on your generator:
+
+```powershell
+.\build\Debug\codebase-analyzer.exe .
+```
+
+or:
+
+```powershell
+.\build\Release\codebase-analyzer.exe .
+```
+
+---
+
+### 📝 CLI Output
+
+After running the CLI analyzer, the project generates a Markdown report:
+
+```txt
+codebase_report.md
+```
+
+The report includes:
+
+- 📁 Total source files
+- 🧾 Total lines
+- ✅ Code lines
+- 💬 Comment lines
+- ⬜ Blank lines
+- 🌐 Language / file distribution
+
+---
+
+## 🧭 Which Mode Should You Use?
+
+| Use Case | Recommended Mode |
+|---|---|
+| I want a clean presentation demo | 🖥️ Desktop UI |
+| I want to choose folder visually | 🖥️ Desktop UI |
+| I want to test the C++ OOP logic directly | ⚙️ CLI Mode |
+| I want the fastest terminal-based workflow | ⚙️ CLI Mode |
+| I want to show both UI and backend architecture | Use both |
+
+> For normal usage and demos, use the **Desktop UI App**.  
+> For explaining the OOP backend, use the **CLI Mode**.
 
 ---
 
@@ -56,15 +316,12 @@ It helps users quickly understand:
 
 ```mermaid
 flowchart TD
-    A[🚀 Open App] --> B[📂 Choose Source Folder]
+    A[🚀 Open Desktop App] --> B[📂 Choose Local Folder]
     B --> C[🔍 Scan Project Directory]
     C --> D[🧠 Analyze Source Files]
-    D --> E[📊 Render Dashboard]
+    D --> E[📊 Display Dashboard]
     E --> F[📝 Export Markdown Report]
 ```
-
-> ✅ The app does **not** analyze a bundled sample by default.  
-> Users must choose a real local folder before the analysis process begins.
 
 ---
 
@@ -72,13 +329,22 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    UI[🖥️ Electron + React UI] --> Scanner[📂 File Scanner / IPC Layer]
-    Scanner --> Core[⚙️ Analyzer Core]
-    Core --> Report[📝 Report Generator]
-    Report --> UI
+    UI[🖥️ Electron + React UI] --> LocalScan[📂 Local Folder Scanner]
+    LocalScan --> Analysis[🧠 Analysis Engine]
+    Analysis --> Dashboard[📊 Dashboard View]
+    Analysis --> Report[📝 Markdown Report]
+
+    CLI[⚙️ C++ CLI Core] --> Scanner[📂 DirectoryScanner]
+    Scanner --> Analyzer[🧩 FileAnalyzer Classes]
+    Analyzer --> CLIReport[📝 ReportGenerator]
 ```
 
-### 🧠 Core OOP Design
+> 📌 Current project contains both a desktop UI analysis flow and a C++ CLI analyzer core.  
+> A future improvement is to connect the Electron UI directly to the C++ executable.
+
+---
+
+## 🧠 Core OOP Design
 
 ```mermaid
 classDiagram
@@ -130,13 +396,13 @@ classDiagram
 
 ## 🧩 OOP Principles Applied
 
-| OOP Principle | How it is applied |
+| Principle | Application in Project |
 |---|---|
-| 🧊 **Abstraction** | `FileAnalyzer` defines a common interface for all file analyzers |
-| 🧬 **Inheritance** | Specific analyzers inherit from `FileAnalyzer` |
+| 🧊 **Abstraction** | `FileAnalyzer` defines the common interface for all analyzers |
+| 🧬 **Inheritance** | Specialized analyzers inherit from `FileAnalyzer` |
 | 🔁 **Polymorphism** | `analyze()` is overridden and called dynamically through base-class pointers |
-| 🔒 **Encapsulation** | Each class owns one clear responsibility: scanning, analyzing, or reporting |
-| 🧱 **Separation of Concerns** | UI, scanning, analysis, and report generation are separated into clear modules |
+| 🔒 **Encapsulation** | Each class manages its own data and responsibility |
+| 🧱 **Separation of Concerns** | Scanning, analyzing, reporting, and UI are separated into modules |
 
 ---
 
@@ -152,32 +418,33 @@ classDiagram
 | 🔷 TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` |
 | 🌐 Web Frontend | `.html`, `.css` |
 
-> 📌 Non-source files such as `.md`, `.json`, `.yml`, `.png`, and generated build files are treated as project metadata or ignored by the analyzer.
+> 📌 Files such as `.md`, `.json`, `.yml`, `.yaml`, images, and generated build outputs are treated as metadata or ignored by the analyzer workflow.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### ⚙️ Core
+### ⚙️ C++ Core
 
-- 🚀 **C++23**
-- 🧱 **CMake 3.20+**
+- 🚀 C++23
+- 🧱 CMake 3.20+
 - 📁 `std::filesystem`
-- 🧠 Smart pointers: `std::unique_ptr`
-- 📦 STL containers: `std::vector`, `std::map`, `std::string`
+- 🧠 `std::unique_ptr`
+- 📦 STL containers
 
 ### 🖥️ Desktop UI
 
-- ⚡ **Electron**
-- ⚛️ **React**
-- 🔷 **TypeScript**
-- 🎨 **Tailwind CSS**
-- 📦 **Vite**
+- ⚡ Electron
+- ⚛️ React
+- 🔷 TypeScript
+- 🎨 Tailwind CSS
+- 📦 Vite
 
 ### 🤖 Automation
 
-- 🧪 GitHub Actions build workflow
-- 📦 Cross-platform artifact generation for Windows, Linux, and macOS
+- GitHub Actions
+- Release artifact generation
+- Cross-platform build workflow
 
 ---
 
@@ -212,45 +479,9 @@ Codebase-Analyzer/
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started for Development
 
-### ✅ Requirements
-
-Make sure these tools are installed:
-
-- 🧩 **Git**
-- ⚙️ **CMake 3.20+**
-- 🧠 A C++ compiler with C++23 support
-- 📦 **Node.js + npm**
-- 🖥️ Windows, Linux, or macOS
-
----
-
-## ⚙️ Build C++ CLI Core
-
-```bash
-git clone https://github.com/ThanhNguyn/Codebase-Analyzer.git
-cd Codebase-Analyzer
-
-cmake -S . -B build
-cmake --build build
-```
-
-Run the analyzer:
-
-```bash
-./build/codebase-analyzer .
-```
-
-On Windows, the executable path may be:
-
-```powershell
-.\build\Debug\codebase-analyzer.exe .
-```
-
----
-
-## 🖥️ Run Desktop UI in Development
+### 🖥️ Run Desktop UI in Development
 
 ```bash
 cd ui_design
@@ -258,11 +489,9 @@ npm install
 npm run dev
 ```
 
-The desktop app will open and ask the user to choose a local project folder.
-
 ---
 
-## 📦 Build Desktop Release
+### 📦 Build Desktop Release
 
 ```bash
 cd ui_design
@@ -276,29 +505,38 @@ Release files will be generated inside:
 ui_design/release/
 ```
 
+> Do not commit `release/` to Git. Release binaries should be uploaded to GitHub Releases instead.
+
 ---
 
-## 📊 Example Report Output
+### ⚙️ Build C++ CLI
 
-```md
-# Codebase Analysis Report
-
-## Summary
-
-- Total files: 17
-- Total lines: 882
-- Code lines: 716
-- Comment lines: 17
-- Blank lines: 149
+```bash
+cmake -S . -B build
+cmake --build build
 ```
+
+---
+
+## 🤖 GitHub Actions
+
+GitHub Actions can be used to build release artifacts for supported operating systems.
+
+Useful links:
+
+- 👉 [GitHub Actions](https://github.com/ThanhNguyn/Codebase-Analyzer/actions)
+- 👉 [Latest Release](https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest)
+- 👉 [All Releases](https://github.com/ThanhNguyn/Codebase-Analyzer/releases)
 
 ---
 
 ## 🧪 Testing Notes
 
-The project was primarily tested on **Windows**.
+The project is mainly tested manually on:
 
-Linux and macOS builds can be generated through GitHub Actions, but full runtime verification should be performed on real machines when available.
+- ✅ Windows
+
+Linux and macOS artifacts may be generated through GitHub Actions, but runtime verification should be done on real devices when available.
 
 ---
 
@@ -308,28 +546,29 @@ Linux and macOS builds can be generated through GitHub Actions, but full runtime
 - [x] ✅ Recursive directory scanner
 - [x] ✅ Markdown report generation
 - [x] ✅ Desktop UI prototype
-- [x] ✅ Local folder selection flow
+- [x] ✅ Required local folder selection flow
 - [x] ✅ Windows desktop build
-- [ ] 🔜 Connect UI directly to C++ analyzer executable
+- [x] ✅ GitHub Release documentation
+- [ ] 🔜 Connect Electron UI directly to C++ executable
 - [ ] 🔜 Add PDF / HTML report export
-- [ ] 🔜 Add charts for language distribution
+- [ ] 🔜 Add visual charts for language distribution
 - [ ] 🔜 Add more language analyzers
-- [ ] 🔜 Add deeper GitHub Actions smoke tests
+- [ ] 🔜 Improve automated smoke testing
 
 ---
 
 ## 🎓 Project Context
 
-This project was developed as part of an **Object-Oriented Programming course project**.
+This project was developed as an **Object-Oriented Programming course project**.
 
-The main academic goal is to demonstrate:
+The academic goal is to demonstrate:
 
 - 🧠 Object-oriented design
-- 🧬 Class inheritance
+- 🧬 Inheritance
 - 🔁 Runtime polymorphism
 - 🔒 Encapsulation
-- 🧩 Maintainable software architecture
-- 🖥️ Practical UI integration for a local analysis tool
+- 🧩 Maintainable architecture
+- 🖥️ Practical desktop UI integration
 
 ---
 
