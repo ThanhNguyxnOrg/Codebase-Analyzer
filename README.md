@@ -133,15 +133,19 @@ npm run dev
 Bạn có thể phân tích **bất kỳ thư mục nào** bằng cách truyền đường dẫn vào phần mềm. Nếu không truyền đường dẫn, ứng dụng sẽ phân tích luôn chính thư mục hiện tại.
 
 ```bash
-# Trên Windows (Quét thư mục hiện tại)
-.\build\Debug\codebase_analyzer.exe
+# Windows
+.\build\Release\codebase_analyzer.exe
 
-# Phân tích một thư mục được chỉ định:
-.\build\Debug\codebase_analyzer.exe "C:\Users\Name\MyProject"
+# macOS / Linux
+./build/Release/codebase_analyzer
+
+# Phân tích một thư mục được chỉ định
+.\build\Release\codebase_analyzer.exe "C:\Users\Name\MyProject"
 ```
 
 🎉 **Kết Quả:** Sau vài mili-giây, bạn sẽ thấy bảng báo cáo siêu chi tiết in ngay trên Terminal/Console, và một file `codebase_report.md` được sinh tự động lưu trữ kết quả phân tích!
 
 ### 4. GitHub Actions
 
-Workflow tại `.github/workflows/ci.yml` sẽ build CLI trên Windows, macOS, và Linux, sau đó upload binary đã cài đặt dưới dạng artifact theo từng OS.
+Workflow tại `.github/workflows/ci.yml` sẽ build CLI trên Windows, macOS, và Linux, rồi upload artifact riêng cho `codebase-analyzer-windows`, `codebase-analyzer-macos`, và `codebase-analyzer-linux`.
+Mỗi artifact chỉ chứa đúng file binary ở root để tải xuống và chạy trực tiếp sau khi giải nén.
