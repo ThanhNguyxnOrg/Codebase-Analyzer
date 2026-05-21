@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { Archive, ArrowRight, BarChart3, CheckCircle2, Clock, Cpu, FileCode2, FolderOpen, Monitor, ShieldCheck } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, Clock, Cpu, FileCode2, FolderOpen, Monitor, ShieldCheck } from "lucide-react";
 import { useAnalysis } from "../../context/AnalysisContext";
-import { DEFAULT_IGNORES, SUPPORTED_LANGUAGES } from "../../lib/analysisEngine";
+import { SUPPORTED_LANGUAGES } from "../../lib/analysisEngine";
 import { detectOS } from "../../utils/platform";
 
 export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; onDashboard: () => void }) {
-  const { result, repositorySnapshot, runRepositoryAnalysis, analyzing, progress } = useAnalysis();
+  const { result, analyzing } = useAnalysis();
   const os = detectOS();
 
   const totalFiles = result?.files.length ?? 0;
@@ -13,15 +13,6 @@ export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; 
   const totalCode = result?.files.reduce((sum, file) => sum + file.code, 0) ?? 0;
   const totalLangs = result?.langs.length ?? 0;
   const visibleFiles = result?.files.slice(0, 8) ?? [];
-
-  const analyzeSampleRepository = async () => {
-    try {
-      await runRepositoryAnalysis(DEFAULT_IGNORES);
-      onDashboard();
-    } catch {
-      // surfaced through context error state
-    }
-  };
 
   return (
     <div className="h-full overflow-auto bg-[#070a0f]">
@@ -67,15 +58,6 @@ export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; 
                 <span className="flex items-center gap-1.5 text-[10px] font-mono text-white/80">
                   start <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
                 </span>
-              </button>
-
-              <button
-                onClick={analyzeSampleRepository}
-                disabled={analyzing}
-                className="w-full mt-2 flex items-center justify-between px-4 py-2.5 rounded-md border border-[#1e2430] hover:border-[#2d3748] hover:bg-[#11151d] disabled:opacity-50 text-[#8a99ad] text-[12px] transition-colors cursor-pointer"
-              >
-                <span className="flex items-center gap-2"><Archive size={13} /> Analyze bundled sample</span>
-                <span className="text-[9px] font-mono text-[#5b687f]">{analyzing ? `${progress}%` : `${repositorySnapshot.files.length} files`}</span>
               </button>
             </div>
           </div>

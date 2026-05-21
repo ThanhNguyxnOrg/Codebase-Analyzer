@@ -57,11 +57,11 @@ std::unique_ptr<FileAnalyzer> DirectoryScanner::createAnalyzer(const std::filesy
         return std::make_unique<CssAnalyzer>(path);
     }
     // ── JavaScript ──
-    if (ext == ".js" || ext == ".jsx") {
+    if (ext == ".js" || ext == ".jsx" || ext == ".mjs" || ext == ".cjs") {
         return std::make_unique<JavaScriptAnalyzer>(path);
     }
     // ── TypeScript ──
-    if (ext == ".ts" || ext == ".tsx") {
+    if (ext == ".ts" || ext == ".tsx" || ext == ".mts" || ext == ".cts") {
         return std::make_unique<TypeScriptAnalyzer>(path);
     }
     // ── Java ──

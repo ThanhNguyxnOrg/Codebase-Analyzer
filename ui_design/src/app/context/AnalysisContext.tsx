@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { repoSnapshot } from "virtual:repo-snapshot";
 import {
   analyzeSources,
   collectDirectoryFiles,
@@ -16,8 +15,6 @@ type ContextValue = {
   progress: number;
   error: string | null;
   projectPath: string;
-  repositorySnapshot: typeof repoSnapshot;
-  runRepositoryAnalysis: (ignores: string[]) => Promise<void>;
   runDirectoryPickerAnalysis: (ignores: string[]) => Promise<void>;
   runUploadedFilesAnalysis: (files: FileList, ignores: string[]) => Promise<void>;
   setProjectPath: (path: string) => void;
@@ -74,13 +71,6 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     [addLog],
   );
 
-  const runRepositoryAnalysis = useCallback(
-    async (ignores: string[]) => {
-      await runSourceAnalysis(repoSnapshot.rootName, "repository", repoSnapshot.files, ignores);
-    },
-    [runSourceAnalysis],
-  );
-
   const runDirectoryPickerAnalysis = useCallback(
     async (ignores: string[]) => {
       setAnalyzing(true);
@@ -134,8 +124,6 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       progress,
       error,
       projectPath,
-      repositorySnapshot: repoSnapshot,
-      runRepositoryAnalysis,
       runDirectoryPickerAnalysis,
       runUploadedFilesAnalysis,
       setProjectPath,
@@ -148,7 +136,6 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       progress,
       error,
       projectPath,
-      runRepositoryAnalysis,
       runDirectoryPickerAnalysis,
       runUploadedFilesAnalysis,
       clearError,

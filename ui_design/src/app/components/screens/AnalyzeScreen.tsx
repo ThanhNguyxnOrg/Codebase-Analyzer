@@ -1,18 +1,16 @@
 import { useCallback, useRef, useState } from "react";
-import { Archive, Check, FolderOpen, Plus, RotateCcw, Upload, X } from "lucide-react";
+import { Check, FolderOpen, Plus, RotateCcw, Upload, X } from "lucide-react";
 import { useAnalysis } from "../../context/AnalysisContext";
 import { canUseDirectoryPicker, DEFAULT_IGNORES, SUPPORTED_LANGUAGES } from "../../lib/analysisEngine";
 import { shortcut } from "../../utils/platform";
 
 export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
   const {
-    runRepositoryAnalysis,
     runDirectoryPickerAnalysis,
     runUploadedFilesAnalysis,
     analyzing,
     progress,
     projectPath,
-    repositorySnapshot,
     error,
     clearError,
   } = useAnalysis();
@@ -24,16 +22,6 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
   const complete = useCallback(() => {
     window.setTimeout(onComplete, 250);
   }, [onComplete]);
-
-  const analyzeRepository = useCallback(async () => {
-    clearError();
-    try {
-      await runRepositoryAnalysis(ignores);
-      complete();
-    } catch {
-      // surfaced by context error state
-    }
-  }, [clearError, complete, ignores, runRepositoryAnalysis]);
 
   const analyzeDirectory = useCallback(async () => {
     clearError();
@@ -81,7 +69,7 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="h-full overflow-auto bg-[#070a0f]">
       <div className="max-w-[980px] mx-auto px-10 py-10">
-        <Header title="Analyze" subtitle="Choose a local project folder or run the bundled sample for demo." path={projectPath} />
+        <Header title="Analyze" subtitle="Choose a local project folder to start analysis." path={projectPath} />
 
         <input
           ref={uploadRef}
@@ -93,20 +81,8 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
 
         <div className="grid grid-cols-[1.15fr_0.85fr] gap-4">
           <div className="rounded-lg border border-[#1f2430] bg-[#0d1117]">
-            <PanelHeader label="source.target" right="real files" />
+            <PanelHeader label="source.target" right="required" />
             <div className="p-4 space-y-3">
-              <button
-                onClick={analyzeRepository}
-                disabled={analyzing}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-md border border-[#1f2430] hover:bg-[#11151d] disabled:opacity-50 disabled:cursor-not-allowed text-[#cbd5e1] transition-colors cursor-pointer"
-              >
-                <span className="flex items-center gap-2 text-[13px]">
-                  <Archive size={15} />
-                  Analyze Bundled Sample
-                </span>
-                <span className="text-[10px] font-mono text-[#6b7280]">{repositorySnapshot.files.length} source files</span>
-              </button>
-
               <button
                 onClick={analyzeDirectory}
                 disabled={analyzing}
