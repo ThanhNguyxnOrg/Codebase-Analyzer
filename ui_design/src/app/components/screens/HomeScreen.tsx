@@ -1,18 +1,20 @@
-import { Archive, ArrowRight, CheckCircle2, Clock, Cpu, FolderOpen, Monitor } from "lucide-react";
+import type { ReactNode } from "react";
+import { Archive, ArrowRight, BarChart3, CheckCircle2, Clock, Cpu, FileCode2, FolderOpen, Monitor, ShieldCheck } from "lucide-react";
 import { useAnalysis } from "../../context/AnalysisContext";
 import { DEFAULT_IGNORES, SUPPORTED_LANGUAGES } from "../../lib/analysisEngine";
-import { detectOS, shortcut } from "../../utils/platform";
+import { detectOS } from "../../utils/platform";
 
 export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; onDashboard: () => void }) {
   const { result, repositorySnapshot, runRepositoryAnalysis, analyzing, progress } = useAnalysis();
   const os = detectOS();
-  const visibleFiles = result
-    ? result.files.slice(0, 8).map((file) => ({ path: file.file, total: file.total }))
-    : repositorySnapshot.files.slice(0, 8).map((file) => ({ path: file.path, total: null }));
-  const totalLines = result?.files.reduce((sum, file) => sum + file.total, 0) ?? countSnapshotLines(repositorySnapshot.files);
-  const codeLines = result?.files.reduce((sum, file) => sum + file.code, 0) ?? null;
 
-  const analyzeRepository = async () => {
+  const totalFiles = result?.files.length ?? 0;
+  const totalLines = result?.files.reduce((sum, file) => sum + file.total, 0) ?? 0;
+  const totalCode = result?.files.reduce((sum, file) => sum + file.code, 0) ?? 0;
+  const totalLangs = result?.langs.length ?? 0;
+  const visibleFiles = result?.files.slice(0, 8) ?? [];
+
+  const analyzeSampleRepository = async () => {
     try {
       await runRepositoryAnalysis(DEFAULT_IGNORES);
       onDashboard();
@@ -23,12 +25,14 @@ export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; 
 
   return (
     <div className="h-full overflow-auto bg-[#070a0f]">
-      <div className="max-w-[980px] mx-auto px-8 py-10">
+      <div className="max-w-[1080px] mx-auto px-8 py-10">
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
-            <div className="text-[10px] font-mono text-[#5b687f] mb-1.5">// local.static-analysis</div>
-            <h1 className="text-[26px] font-bold tracking-tight text-[#f3f4f6]">Codebase Analyzer</h1>
-            <p className="text-[13px] text-[#8a99ad] mt-1">Scan source folders, inspect language mix, and export a reproducible report.</p>
+            <div className="text-[10px] font-mono text-[#5b687f] mb-1.5">// local code intelligence</div>
+            <h1 className="text-[30px] font-bold tracking-tight text-[#f3f4f6]">Codebase Analyzer</h1>
+            <p className="text-[13px] text-[#8a99ad] mt-2 max-w-[620px]">
+              Select a source folder, analyze code structure, inspect language distribution, and export a clean report.
+            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <Badge active={os === "windows"}>Windows</Badge>
@@ -37,104 +41,127 @@ export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; 
           </div>
         </div>
 
-        <div className="grid grid-cols-[1.2fr_0.8fr] gap-5">
-          <div className="rounded-lg border border-[#1e2430] bg-[#0c1017] shadow-lg">
-            <div className="px-4 py-2.5 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
-              <div className="text-[10px] font-mono text-[#5b687f]">workspace.actions</div>
-              <div className="text-[9px] font-mono text-[#4b5563]">{shortcut("O")}</div>
+        <div className="grid grid-cols-[1.15fr_0.85fr] gap-5">
+          <div className="rounded-xl border border-[#1e2430] bg-[#0c1017] shadow-lg overflow-hidden">
+            <div className="px-5 py-3 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
+              <div className="text-[10px] font-mono text-[#5b687f]">start.analysis</div>
+              <div className="text-[9px] font-mono text-[#4b5563]">local-first</div>
             </div>
             <div className="p-5">
-              <div className="font-mono text-[11px] text-[#8a99ad] leading-relaxed mb-6 bg-[#070a0f] p-4 rounded border border-[#161b24]">
-                <div><span className="text-[#5f8cff]">$</span> analyzer --source {repositorySnapshot.rootName}</div>
+              <div className="rounded-lg border border-[#161b24] bg-[#070a0f] p-4 font-mono text-[11px] leading-relaxed mb-5">
+                <div><span className="text-[#5f8cff]">$</span> analyzer --source <span className="text-[#8a99ad]">choose-folder</span></div>
+                <div className="text-[#5b687f]"><span className="text-amber-400">idle</span> waiting for a workspace</div>
                 <div className="text-[#5b687f]"><span className="text-emerald-500">ok</span> parsers: {SUPPORTED_LANGUAGES.join(", ")}</div>
-                <div className="text-[#5b687f]"><span className="text-emerald-500">ok</span> repository snapshot: {repositorySnapshot.files.length} source files</div>
-                <div className="text-[#5b687f]"><span className="text-amber-500">run</span> branch: {repositorySnapshot.gitBranch}</div>
+                <div className="text-[#5b687f]"><span className="text-emerald-500">ok</span> output: dashboard + markdown report</div>
               </div>
-
-              <button
-                onClick={analyzeRepository}
-                disabled={analyzing}
-                className="w-full group flex items-center justify-between px-4 py-2.5 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all shadow-[0_0_0_1px_#3b82f6_inset] cursor-pointer"
-              >
-                <span className="flex items-center gap-2">
-                  <Archive size={14} />
-                  <span className="text-[13px] font-medium">Analyze This Repository</span>
-                </span>
-                <span className="flex items-center gap-1.5 text-[9px] font-mono text-white/80">
-                  {analyzing ? `${progress}%` : "snapshot"} <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
-                </span>
-              </button>
 
               <button
                 onClick={onAnalyze}
                 disabled={analyzing}
-                className="w-full mt-2 flex items-center justify-between px-4 py-2 rounded-md border border-[#1e2430] hover:border-[#2d3748] hover:bg-[#11151d] disabled:opacity-50 text-[#8a99ad] text-[12px] transition-colors cursor-pointer"
+                className="w-full group flex items-center justify-between px-4 py-3 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all shadow-[0_0_0_1px_#3b82f6_inset] cursor-pointer"
               >
-                <span className="flex items-center gap-2"><FolderOpen size={12} /> Choose Another Folder</span>
-                <span className="text-[9px] font-mono text-[#5b687f]">{shortcut("O")}</span>
+                <span className="flex items-center gap-2">
+                  <FolderOpen size={15} />
+                  <span className="text-[13px] font-medium">Choose Source Folder</span>
+                </span>
+                <span className="flex items-center gap-1.5 text-[10px] font-mono text-white/80">
+                  start <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </button>
+
+              <button
+                onClick={analyzeSampleRepository}
+                disabled={analyzing}
+                className="w-full mt-2 flex items-center justify-between px-4 py-2.5 rounded-md border border-[#1e2430] hover:border-[#2d3748] hover:bg-[#11151d] disabled:opacity-50 text-[#8a99ad] text-[12px] transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2"><Archive size={13} /> Analyze bundled sample</span>
+                <span className="text-[9px] font-mono text-[#5b687f]">{analyzing ? `${progress}%` : `${repositorySnapshot.files.length} files`}</span>
               </button>
             </div>
           </div>
 
-          <div className="rounded-lg border border-[#1e2430] bg-[#0c1017]">
-            <div className="px-4 py-2.5 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
-              <div className="text-[10px] font-mono text-[#5b687f]">latest.analysis</div>
-              <div className="text-[9px] font-mono text-[#4b5563]">{result ? result.timestamp : "none"}</div>
+          <div className="rounded-xl border border-[#1e2430] bg-[#0c1017] overflow-hidden">
+            <div className="px-5 py-3 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
+              <div className="text-[10px] font-mono text-[#5b687f]">current.session</div>
+              <div className="text-[9px] font-mono text-[#4b5563]">{result ? result.timestamp : "not started"}</div>
             </div>
             {result ? (
-              <button onClick={onDashboard} className="w-full text-left px-4 py-4 hover:bg-[#11151d] group cursor-pointer transition-colors">
+              <button onClick={onDashboard} className="w-full text-left p-5 hover:bg-[#11151d] group cursor-pointer transition-colors">
                 <div className="flex items-center justify-between">
-                  <div className="text-[13px] text-[#e5e7eb] group-hover:text-[#5f8cff] transition-colors">{result.path}</div>
-                  <CheckCircle2 size={14} className="text-emerald-400" />
+                  <div className="min-w-0">
+                    <div className="text-[13px] text-[#e5e7eb] group-hover:text-[#5f8cff] transition-colors truncate">{result.path}</div>
+                    <div className="text-[11px] text-[#5b687f] mt-1">Analysis completed in {result.elapsed}s</div>
+                  </div>
+                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
                 </div>
-                <div className="mt-2 grid grid-cols-3 gap-2 font-mono text-[11px]">
-                  <Metric label="files" value={String(result.files.length)} />
-                  <Metric label="lines" value={String(result.files.reduce((sum, file) => sum + file.total, 0))} />
-                  <Metric label="langs" value={String(result.langs.length)} />
+                <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-[11px]">
+                  <Metric label="files" value={String(totalFiles)} />
+                  <Metric label="lines" value={String(totalLines)} />
+                  <Metric label="langs" value={String(totalLangs)} />
                 </div>
               </button>
             ) : (
-              <div className="px-4 py-4 text-[12px] text-[#8a99ad]">
-                <div className="flex items-center gap-2 text-[#cbd5e1]"><Clock size={13} /> No completed analysis yet</div>
-                <div className="mt-2 font-mono text-[11px] text-[#5b687f]">Run the repository snapshot or choose a local folder.</div>
+              <div className="p-5 text-[12px] text-[#8a99ad]">
+                <div className="flex items-center gap-2 text-[#cbd5e1]"><Clock size={14} /> No workspace analyzed yet</div>
+                <div className="mt-2 text-[#5b687f] leading-relaxed">
+                  Choose a local project folder to unlock dashboard metrics, file tables, and report export.
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-5 rounded-lg border border-[#1e2430] bg-[#0c1017] overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
-            <div className="text-[10px] font-mono text-[#5b687f]">
-              workspace.structure · {result?.path ?? repositorySnapshot.rootName}
-            </div>
-            <div className="text-[9px] font-mono text-[#4b5563]">{visibleFiles.length} shown</div>
+        <div className="grid grid-cols-3 gap-4 mt-5">
+          <Feature icon={<ShieldCheck size={16} />} title="Local-first" text="Files are read from your selected folder and processed on the device." />
+          <Feature icon={<FileCode2 size={16} />} title="Multi-language" text="C, C++, Python, Java, C#, HTML, CSS, JavaScript, and TypeScript." />
+          <Feature icon={<BarChart3 size={16} />} title="Report-ready" text="Generate statistics for slides, documentation, and Markdown reports." />
+        </div>
+
+        <div className="mt-5 rounded-xl border border-[#1e2430] bg-[#0c1017] overflow-hidden">
+          <div className="px-5 py-3 border-b border-[#1e2430] flex items-center justify-between bg-[#090d14]">
+            <div className="text-[10px] font-mono text-[#5b687f]">workspace.preview</div>
+            <div className="text-[9px] font-mono text-[#4b5563]">{result ? `${visibleFiles.length} shown` : "empty"}</div>
           </div>
-          <div className="grid grid-cols-2 font-mono text-[11px] text-[#8a99ad]">
-            <div className="p-4 border-r border-[#1e2430] leading-[1.8] bg-[#080b11]">
-              {visibleFiles.map((file, index) => (
-                <div key={file.path} className="text-[#5b687f]">
-                  {index < visibleFiles.length - 1 ? "├─" : "└─"} {file.path}{" "}
-                  {file.total !== null && <span className="text-[#4b5563]">· {file.total} LOC</span>}
+          {result ? (
+            <div className="grid grid-cols-2 font-mono text-[11px] text-[#8a99ad]">
+              <div className="p-4 border-r border-[#1e2430] leading-[1.8] bg-[#080b11]">
+                {visibleFiles.map((file, index) => (
+                  <div key={file.file} className="text-[#5b687f]">
+                    {index < visibleFiles.length - 1 ? "├─" : "└─"} {file.file}{" "}
+                    <span className="text-[#4b5563]">· {file.total} LOC</span>
+                  </div>
+                ))}
+              </div>
+              <div className="p-4 leading-[1.8] text-[11px] bg-[#0c1017]">
+                <div className="text-[#4b5563]">// repository metrics</div>
+                <div><span className="text-[#5f8cff]">source_files</span> = <span className="text-amber-300">{totalFiles}</span></div>
+                <div><span className="text-[#5f8cff]">active_parsers</span> = <span className="text-emerald-300">{SUPPORTED_LANGUAGES.length}</span></div>
+                <div><span className="text-[#5f8cff]">total_loc</span> = <span className="text-amber-300">{totalLines}</span></div>
+                <div><span className="text-[#5f8cff]">code_loc</span> = <span className="text-amber-300">{totalCode}</span></div>
+                <div className="pt-2 flex items-center gap-2 text-[#4b5563]"><Monitor size={11} /> app source: web renderer</div>
+                <div className="flex items-center gap-2 text-[#4b5563]"><Cpu size={11} /> desktop shell: Electron</div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 flex items-center justify-center text-center">
+              <div>
+                <div className="mx-auto w-11 h-11 rounded-xl border border-[#1e2430] bg-[#090d14] flex items-center justify-center text-[#7c9cff] mb-3">
+                  <FolderOpen size={20} />
                 </div>
-              ))}
+                <div className="text-[14px] text-[#e5e7eb]">No folder selected</div>
+                <div className="text-[12px] text-[#5b687f] mt-1 max-w-[380px]">
+                  The file tree and metrics will appear here after the first analysis.
+                </div>
+              </div>
             </div>
-            <div className="p-4 leading-[1.8] text-[11px] bg-[#0c1017]">
-              <div className="text-[#4b5563]">// repository metrics</div>
-              <div><span className="text-[#5f8cff]">source_files</span> = <span className="text-amber-300">{result?.files.length ?? repositorySnapshot.files.length}</span></div>
-              <div><span className="text-[#5f8cff]">active_parsers</span> = <span className="text-emerald-300">{SUPPORTED_LANGUAGES.length}</span></div>
-              <div><span className="text-[#5f8cff]">total_loc</span> = <span className="text-amber-300">{totalLines}</span></div>
-              <div><span className="text-[#5f8cff]">code_loc</span> = <span className="text-amber-300">{codeLines ?? "run analysis"}</span></div>
-              <div className="pt-2 flex items-center gap-2 text-[#4b5563]"><Monitor size={11} /> app source: web</div>
-              <div className="flex items-center gap-2 text-[#4b5563]"><Cpu size={11} /> desktop shell: Electron</div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function Badge({ children, active }: { children: React.ReactNode; active?: boolean }) {
+function Badge({ children, active }: { children: ReactNode; active?: boolean }) {
   return (
     <span className={`inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded border transition-colors ${
       active
@@ -155,11 +182,14 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function countSnapshotLines(files: Array<{ text: string }>) {
-  return files.reduce((sum, file) => {
-    if (!file.text) return sum;
-    const normalized = file.text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-    const lines = normalized.endsWith("\n") ? normalized.slice(0, -1).split("\n") : normalized.split("\n");
-    return sum + lines.length;
-  }, 0);
+function Feature({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+  return (
+    <div className="rounded-xl border border-[#1e2430] bg-[#0c1017] p-4">
+      <div className="flex items-center gap-2 text-[#cbd5e1] text-[13px]">
+        <span className="text-[#7c9cff]">{icon}</span>
+        {title}
+      </div>
+      <div className="text-[12px] text-[#5b687f] leading-relaxed mt-2">{text}</div>
+    </div>
+  );
 }

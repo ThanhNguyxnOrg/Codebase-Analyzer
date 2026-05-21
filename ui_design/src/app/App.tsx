@@ -13,7 +13,7 @@ import { clockNow } from "./utils/platform";
 
 function AppInner() {
   const [screen, setScreen] = useState<Screen>("home");
-  const { analyzing, projectPath, repositorySnapshot, result } = useAnalysis();
+  const { analyzing, projectPath, result } = useAnalysis();
 
   // ── Global keyboard shortcuts ────────────────────────────────────
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -49,7 +49,7 @@ function AppInner() {
               {screen === "report" && <ReportScreen />}
               {screen === "settings" && <SettingsScreen />}
             </div>
-            <StatusBar screen={screen} branch={repositorySnapshot.gitBranch} hasResult={Boolean(result)} />
+            <StatusBar screen={screen} workspace={projectPath || "no workspace selected"} hasResult={Boolean(result)} />
           </main>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function App() {
   );
 }
 
-function StatusBar({ screen, branch, hasResult }: { screen: Screen; branch: string; hasResult: boolean }) {
+function StatusBar({ screen, workspace, hasResult }: { screen: Screen; workspace: string; hasResult: boolean }) {
   const [time, setTime] = useState(clockNow());
   useEffect(() => {
     const id = setInterval(() => setTime(clockNow()), 10_000);
@@ -75,7 +75,7 @@ function StatusBar({ screen, branch, hasResult }: { screen: Screen; branch: stri
   return (
     <div className="h-6 shrink-0 border-t border-[#1f2430] bg-[#0a0d12] flex items-center justify-between px-3 text-[10px] font-mono text-[#6b7280]">
       <div className="flex items-center gap-3">
-        <span className="flex items-center gap-1"><GitBranch size={10} /> {branch}</span>
+        <span className="flex items-center gap-1"><GitBranch size={10} /> {workspace}</span>
         <span>{hasResult ? "analysis loaded" : "no analysis"}</span>
       </div>
       <div className="flex items-center gap-3">

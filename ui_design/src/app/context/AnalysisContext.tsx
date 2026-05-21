@@ -32,7 +32,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [projectPath, setProjectPath] = useState(repoSnapshot.rootName);
+  const [projectPath, setProjectPath] = useState("");
 
   const addLog = useCallback((kind: LogEntry["kind"], message: string) => {
     setLogs((prev) => [...prev, { time: timeNow(), kind, message }]);

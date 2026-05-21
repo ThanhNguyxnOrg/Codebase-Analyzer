@@ -81,7 +81,7 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="h-full overflow-auto bg-[#070a0f]">
       <div className="max-w-[980px] mx-auto px-10 py-10">
-        <Header title="Analyze" subtitle="Run the analyzer against real source files." path={projectPath} />
+        <Header title="Analyze" subtitle="Choose a local project folder or run the bundled sample for demo." path={projectPath} />
 
         <input
           ref={uploadRef}
@@ -98,31 +98,31 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
               <button
                 onClick={analyzeRepository}
                 disabled={analyzing}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-md border border-[#1f2430] hover:bg-[#11151d] disabled:opacity-50 disabled:cursor-not-allowed text-[#cbd5e1] transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2 text-[13px]">
                   <Archive size={15} />
-                  Analyze This Repository
+                  Analyze Bundled Sample
                 </span>
-                <span className="text-[10px] font-mono text-white/75">{repositorySnapshot.files.length} source files</span>
+                <span className="text-[10px] font-mono text-[#6b7280]">{repositorySnapshot.files.length} source files</span>
               </button>
 
               <button
                 onClick={analyzeDirectory}
                 disabled={analyzing}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-md border border-[#1f2430] hover:bg-[#11151d] disabled:opacity-50 disabled:cursor-not-allowed text-[#cbd5e1] transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-md bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2 text-[13px]">
                   <FolderOpen size={15} />
                   Choose Local Folder
                 </span>
-                <span className="text-[10px] font-mono text-[#6b7280]">{canUseDirectoryPicker() ? shortcut("O") : "upload"}</span>
+                <span className="text-[10px] font-mono text-white/75">{canUseDirectoryPicker() ? shortcut("O") : "upload"}</span>
               </button>
 
               <div className="rounded-md border border-[#1f2430] bg-[#090d14] px-3 py-2 font-mono text-[11px] text-[#6b7280]">
                 <div className="flex items-center justify-between">
                   <span>current_target</span>
-                  <span className="text-[#9ca3af] truncate max-w-[340px]">{projectPath}</span>
+                  <span className="text-[#9ca3af] truncate max-w-[340px]">{projectPath || "No folder selected"}</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between">
                   <span>browser_mode</span>
