@@ -164,13 +164,13 @@ Ignored: ${result.ignores.map((i) => `\`${i}\``).join(", ")}.
                 </button>
               </div>
               <div className="px-4 py-2.5 border-t border-[#1f2430] text-[11px] font-mono text-[#4b5563]">
-                output · browser download
+                output · app download
               </div>
             </div>
 
             <div className="rounded-lg border border-[#1f2430] bg-[#0a0d12]">
               <div className="px-3 py-2 border-b border-[#1f2430] flex items-center justify-between">
-                <span className="text-[11px] font-mono text-[#6b7280]">terminal · {shellName()}</span>
+                <span className="text-[11px] font-mono text-[#6b7280]">activity log · {shellName()}</span>
                 <div className="flex gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#ff5f57]/70" />
                   <span className="w-2 h-2 rounded-full bg-[#febc2e]/70" />

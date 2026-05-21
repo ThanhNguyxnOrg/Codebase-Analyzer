@@ -3,6 +3,7 @@ build/
 bin/
 dist/
 out/
+release/
 
 # IDE / OS specific files
 .vscode/

@@ -75,7 +75,11 @@ type LanguageSpec = {
   kind: "cLike" | "css" | "html" | "python";
 };
 
-export const DEFAULT_IGNORES = [".git", "build", "node_modules", "bin", "dist", "venv", ".next", "coverage"];
+type DesktopBridge = {
+  pickDirectory: () => Promise<{ rootPath: string; files: SourceFile[] } | null>;
+};
+
+export const DEFAULT_IGNORES = [".git", "build", "release", "node_modules", "bin", "dist", "venv", ".next", "coverage"];
 
 const LANGUAGE_SPECS: LanguageSpec[] = [
   { name: "C++", extensions: [".cpp", ".cxx", ".cc", ".hpp", ".hxx", ".hh"], color: "#4f8cff", kind: "cLike" },
@@ -96,7 +100,7 @@ const LANGUAGE_BY_EXT = new Map<string, LanguageSpec>(
 );
 
 export function canUseDirectoryPicker() {
-  return typeof window !== "undefined" && "showDirectoryPicker" in window;
+  return typeof window !== "undefined" && (Boolean(getDesktopBridge()) || "showDirectoryPicker" in window);
 }
 
 export function detectLanguage(filePath: string): LanguageSpec | null {
@@ -174,6 +178,17 @@ export async function analyzeSources(options: AnalyzeOptions): Promise<AnalysisR
 }
 
 export async function collectDirectoryFiles(ignores: string[], onLog?: (kind: LogEntry["kind"], message: string) => void) {
+  const desktopBridge = getDesktopBridge();
+  if (desktopBridge) {
+    const result = await desktopBridge.pickDirectory();
+    if (!result) {
+      throw new Error("No folder selected.");
+    }
+
+    onLog?.("scan", `Reading ${result.rootPath}`);
+    return result;
+  }
+
   if (!canUseDirectoryPicker()) {
     throw new Error("Directory picker is not available in this browser.");
   }
@@ -434,6 +449,11 @@ async function walkDirectoryHandle(
 
 function normalizePath(path: string) {
   return path.replace(/\\/g, "/").replace(/^\/+/, "").replace(/\/{2,}/g, "/");
+}
+
+function getDesktopBridge(): DesktopBridge | null {
+  if (typeof window === "undefined") return null;
+  return window.codebaseAnalyzer ?? null;
 }
 
 function formatTimestamp(date: Date) {

@@ -125,7 +125,7 @@ export function HomeScreen({ onAnalyze, onDashboard }: { onAnalyze: () => void; 
               <div><span className="text-[#5f8cff]">total_loc</span> = <span className="text-amber-300">{totalLines}</span></div>
               <div><span className="text-[#5f8cff]">code_loc</span> = <span className="text-amber-300">{codeLines ?? "run analysis"}</span></div>
               <div className="pt-2 flex items-center gap-2 text-[#4b5563]"><Monitor size={11} /> app source: web</div>
-              <div className="flex items-center gap-2 text-[#4b5563]"><Cpu size={11} /> native core: C++23 CLI</div>
+              <div className="flex items-center gap-2 text-[#4b5563]"><Cpu size={11} /> desktop shell: Electron</div>
             </div>
           </div>
         </div>

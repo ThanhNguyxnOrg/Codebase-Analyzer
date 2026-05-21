@@ -1,4 +1,4 @@
-name: cli-build
+name: desktop-build
 
 on:
   push:
@@ -6,75 +6,68 @@ on:
   workflow_dispatch:
 
 jobs:
-  cli:
+  desktop:
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             artifact_name: codebase-analyzer-linux
-            binary_name: codebase_analyzer
-            binary_path: build/stage/bin/codebase_analyzer
+            artifact_path: ui_design/release/codebase-analyzer-linux.AppImage
+            smoke_path: ./release/codebase-analyzer-linux.AppImage
           - os: macos-latest
             artifact_name: codebase-analyzer-macos
-            binary_name: codebase_analyzer
-            binary_path: build/stage/bin/codebase_analyzer
+            artifact_path: ui_design/release/codebase-analyzer-mac.dmg
+            smoke_path: ./release/mac/Codebase Analyzer.app/Contents/MacOS/Codebase Analyzer
           - os: windows-latest
             artifact_name: codebase-analyzer-windows
-            binary_name: codebase_analyzer.exe
-            binary_path: build/stage/bin/codebase_analyzer.exe
+            artifact_path: ui_design/release/codebase-analyzer-win.exe
+            smoke_path: .\release\codebase-analyzer-win.exe
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: pwsh
+        working-directory: ui_design
     steps:
       - uses: actions/checkout@v6
 
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: cmake --build build --config Release
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui_design/package-lock.json
 
       - name: Install
-        run: cmake --install build --config Release --prefix build/stage
+        run: npm ci
 
-      - name: Smoke test
+      - name: Install Linux smoke deps
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          $exe = Resolve-Path $env:BINARY_PATH
-          & $exe.Path $PWD.Path
-        env:
-          BINARY_PATH: ${{ matrix.binary_path }}
+          sudo apt-get update
+          sudo apt-get install -y xvfb
 
-      - name: Prepare package
+      - name: Package
+        run: npm run dist
+
+      - name: Smoke test packaged app
         run: |
-          $packageRoot = Join-Path $PWD.Path build/package
-          $demoRoot = Join-Path $packageRoot demo-source
-          New-Item -ItemType Directory -Force $demoRoot | Out-Null
-          Copy-Item $env:BINARY_PATH (Join-Path $packageRoot $env:BINARY_NAME) -Force
-          git ls-files | ForEach-Object {
-            $dest = Join-Path $demoRoot $_
-            $destDir = Split-Path $dest -Parent
-            if ($destDir) {
-              New-Item -ItemType Directory -Force $destDir | Out-Null
+          $env:CBA_SMOKE_TEST = '1'
+          if ("${{ matrix.os }}" -eq "ubuntu-latest") {
+            & xvfb-run -a "${{ matrix.smoke_path }}" --appimage-extract-and-run
+          } elseif ("${{ matrix.os }}" -eq "macos-latest") {
+            $bundle = Get-ChildItem release -Directory -Recurse | Where-Object { $_.Name -like "*.app" } | Select-Object -First 1
+            if (-not $bundle) {
+              throw "macOS app bundle not found"
             }
-            Copy-Item $_ $dest -Force
+            & (Join-Path $bundle.FullName "Contents/MacOS/Codebase Analyzer")
+          } else {
+            & "${{ matrix.smoke_path }}"
           }
-        env:
-          BINARY_PATH: ${{ matrix.binary_path }}
-          BINARY_NAME: ${{ matrix.binary_name }}
-
-      - name: Package smoke test
-        run: |
-          $packageRoot = Join-Path $PWD.Path build/package
-          $exe = Join-Path $packageRoot $env:BINARY_NAME
-          & $exe $packageRoot
-          Remove-Item (Join-Path $packageRoot codebase_report.md) -Force
-        env:
-          BINARY_NAME: ${{ matrix.binary_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
-          path: build/package
+          path: ${{ matrix.artifact_path }}
+          archive: false
           if-no-files-found: error

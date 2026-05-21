@@ -34,6 +34,7 @@ const IGNORED_DIRS = new Set([
   '.git',
   '.github',
   'build',
+  'release',
   'bin',
   'dist',
   'node_modules',

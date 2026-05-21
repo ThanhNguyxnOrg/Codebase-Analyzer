@@ -3,13 +3,14 @@ import { canUseDirectoryPicker, DEFAULT_IGNORES, SUPPORTED_LANGUAGES } from "../
 import { detectOS, shellName } from "../../utils/platform";
 
 export function SettingsScreen() {
+  const desktopShell = typeof window !== "undefined" && window.codebaseAnalyzer?.pickDirectory ? "Electron desktop shell" : "Browser renderer";
   const rows = [
     ["Platform", `${detectOS()} · ${navigator.platform}`],
-    ["Folder access", canUseDirectoryPicker() ? "File System Access API" : "folder upload fallback"],
+    ["Folder access", typeof window !== "undefined" && window.codebaseAnalyzer?.pickDirectory ? "native folder dialog" : canUseDirectoryPicker() ? "File System Access API" : "folder upload fallback"],
     ["Report export", "Markdown download, browser print to PDF"],
-    ["Native core", "C++23 CLI, CMake 3.20+"],
+    ["Desktop shell", desktopShell],
     ["Default ignores", DEFAULT_IGNORES.join(", ")],
-    ["Shell hint", shellName()],
+    ["Host shell", shellName()],
   ];
 
   return (

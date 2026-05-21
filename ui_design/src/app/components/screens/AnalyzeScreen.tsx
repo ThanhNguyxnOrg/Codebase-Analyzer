@@ -217,7 +217,7 @@ export function AnalyzeScreen({ onComplete }: { onComplete: () => void }) {
             </div>
 
             <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-[#4b5563]">
-              <span>engine: browser · reports: markdown/pdf</span>
+              <span>engine: web renderer · reports: markdown/pdf</span>
               <button
                 onClick={openUploadFallback}
                 disabled={analyzing}

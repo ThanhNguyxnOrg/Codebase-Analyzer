@@ -19,7 +19,7 @@ export function TitleBar({ path }: { path?: string }) {
       </div>
       <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#6b7280]">
         <Activity size={12} className="text-emerald-400" />
-        local web app
+        desktop app
       </div>
     </header>
   );
