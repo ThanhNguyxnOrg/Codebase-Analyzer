@@ -9,6 +9,7 @@
 #include "JavaAnalyzer.hpp"
 #include "CSharpAnalyzer.hpp"
 #include <algorithm>
+#include <cctype>
 
 namespace cba {
 
@@ -31,7 +32,9 @@ std::unique_ptr<FileAnalyzer> DirectoryScanner::createAnalyzer(const std::filesy
     }
 
     std::string ext = path.extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
 
     // ── C++ ──
     if (ext == ".cpp" || ext == ".hpp" || ext == ".cxx" || ext == ".cc" || ext == ".hxx" || ext == ".hh") {

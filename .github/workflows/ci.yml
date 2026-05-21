@@ -1,0 +1,49 @@
+name: cli-build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cli:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: codebase-analyzer-linux
+            binary_path: build/stage/bin/codebase_analyzer
+          - os: macos-latest
+            artifact_name: codebase-analyzer-macos
+            binary_path: build/stage/bin/codebase_analyzer
+          - os: windows-latest
+            artifact_name: codebase-analyzer-windows
+            binary_path: build/stage/bin/codebase_analyzer.exe
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Install
+        run: cmake --install build --config Release --prefix build/stage
+
+      - name: Smoke test
+        run: |
+          $exe = Resolve-Path $env:BINARY_PATH
+          & $exe.Path $PWD.Path
+        env:
+          BINARY_PATH: ${{ matrix.binary_path }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: build/stage

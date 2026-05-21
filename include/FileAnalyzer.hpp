@@ -22,6 +22,7 @@ enum class Language {
     CSS,           // CSS (.css)
     JavaScript,    // JavaScript (.js, .jsx)
     TypeScript,    // TypeScript (.ts, .tsx)
+    Web,           // Legacy combined web bucket
     Unknown
 };
 

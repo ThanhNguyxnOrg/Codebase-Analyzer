@@ -4,6 +4,8 @@ project(CodebaseAnalyzer
         DESCRIPTION "Local codebase scanner & LOC analyzer"
         LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -37,3 +39,6 @@ set(SOURCES
 
 add_executable(codebase_analyzer ${SOURCES})
 target_include_directories(codebase_analyzer PRIVATE include)
+
+install(TARGETS codebase_analyzer
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
