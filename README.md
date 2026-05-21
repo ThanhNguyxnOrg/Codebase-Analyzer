@@ -148,4 +148,4 @@ Bạn có thể phân tích **bất kỳ thư mục nào** bằng cách truyền
 ### 4. GitHub Actions
 
 Workflow tại `.github/workflows/ci.yml` sẽ build CLI trên Windows, macOS, và Linux, rồi upload artifact riêng cho `codebase-analyzer-windows`, `codebase-analyzer-macos`, và `codebase-analyzer-linux`.
-Mỗi artifact là đúng một binary riêng theo OS, không còn lớp zip lồng thêm bên ngoài, nên tải xuống là có thể chạy trực tiếp.
+Mỗi artifact chứa binary theo OS ở root và thêm snapshot `demo-source/` của repo hiện tại để chạy ngay sau khi giải nén. Khi mở binary từ thư mục đó, nó sẽ quét chính snapshot này và sinh `codebase_report.md` cạnh nó.
