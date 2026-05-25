@@ -350,46 +350,76 @@ flowchart LR
 classDiagram
     class FileAnalyzer {
         <<abstract>>
-        - string filePath
-        - string fileName
-        - size_t fileSize
-        - int codeLines
-        - int commentLines
-        - int blankLines
-        + analyze()* void
-        + printInfo() void
+        #filePath_ : filesystem::path
+        #fileName_ : string
+        #fileSize_ : uintmax_t
+        #codeLines_ : size_t
+        #commentLines_ : size_t
+        #blankLines_ : size_t
+        +analyze()* void
+        +languageName()* string
+        +language()* Language
+        +totalLines() size_t
+        +filePath() const path&
+        +fileName() const string&
+        +codeLines() size_t
+        +commentLines() size_t
+        +blankLines() size_t
+        #isBlank(line) bool$
+        #trim(s) void$
     }
 
-    class CppAnalyzer
-    class JavaAnalyzer
-    class CSharpAnalyzer
-    class PythonAnalyzer
-    class JavaScriptAnalyzer
-    class TypeScriptAnalyzer
-    class WebAnalyzer
-
     class DirectoryScanner {
-        - string rootPath
-        - vector~unique_ptr~FileAnalyzer~~ files
-        + scanDirectory() void
-        + runAnalysis() void
-        + getFiles()
+        -rootPath_ : filesystem::path
+        -files_ : vector~unique_ptr~FileAnalyzer~~
+        -ignoredDirectories_ : size_t
+        -ignoredFiles_ : size_t
+        -unsupportedFiles_ : size_t
+        -defaultIgnoreRules_ : vector~string~
+        -gitignoreRules_ : vector~string~
+        -appliedIgnoreRules_ : vector~string~
+        +scanDirectory() void
+        +runAnalysis() void
+        +getFiles() const vector&
+        +getRootPath() const path&
+        +ignoredDirectoriesCount() size_t
+        +ignoredFilesCount() size_t
+        +unsupportedFilesCount() size_t
+        -loadIgnoreRules() void
+        -shouldIgnore(path, isDir) bool
+        -createAnalyzer(path) unique_ptr
     }
 
     class ReportGenerator {
-        + generateReport(files) void
+        -scanner_ : const DirectoryScanner&
+        +printConsoleReport() void
+        +generateMarkdownReport(path) void
     }
 
+    class CppAnalyzer
+    class CAnalyzer
+    class PythonAnalyzer
+    class JavaAnalyzer
+    class CSharpAnalyzer
+    class JavaScriptAnalyzer
+    class TypeScriptAnalyzer
+    class WebAnalyzer
+    class HtmlAnalyzer
+    class CssAnalyzer
+
     FileAnalyzer <|-- CppAnalyzer
+    FileAnalyzer <|-- CAnalyzer
+    FileAnalyzer <|-- PythonAnalyzer
     FileAnalyzer <|-- JavaAnalyzer
     FileAnalyzer <|-- CSharpAnalyzer
-    FileAnalyzer <|-- PythonAnalyzer
     FileAnalyzer <|-- JavaScriptAnalyzer
     FileAnalyzer <|-- TypeScriptAnalyzer
     FileAnalyzer <|-- WebAnalyzer
+    FileAnalyzer <|-- HtmlAnalyzer
+    FileAnalyzer <|-- CssAnalyzer
 
-    DirectoryScanner --> FileAnalyzer
-    ReportGenerator --> FileAnalyzer
+    DirectoryScanner *-- FileAnalyzer : Composition
+    ReportGenerator --> DirectoryScanner : Dependency
 ```
 
 ---
@@ -572,11 +602,13 @@ The academic goal is to demonstrate:
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Team — 404 Team Not Found
 
-**Nguyễn Tuấn Thành**  
-Student ID: `25112107`  
-Team: **404 Team Not Found**
+| Name | Student ID | Role |
+|---|---|---|
+| **Nguyễn Tuấn Thành** | `25112107` | 👑 Leader |
+| **Đoàn Ngọc Bích** | `25112138` | Member |
+| **Nguyễn Đăng Khoa** | `25112163` | Member |
 
 ---
 
