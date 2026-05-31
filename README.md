@@ -31,6 +31,16 @@
 
 ---
 
+## 🎬 Demo Video
+
+Below is a quick video demonstration of the **Codebase Analyzer** (both Desktop UI and C++ CLI Core) in action:
+
+<div align="center">
+  <video src="assets/demo.mkv" width="100%" max-width="800px" controls></video>
+</div>
+
+---
+
 ## 📌 Overview
 
 **Codebase Analyzer** is an Object-Oriented Programming project designed to analyze local source code repositories.
