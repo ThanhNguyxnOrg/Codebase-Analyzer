@@ -258,25 +258,25 @@ cmake --build build
 Analyze the current folder:
 
 ```bash
-./build/codebase-analyzer .
+./build/codebase_analyzer .
 ```
 
 Analyze a specific folder:
 
 ```bash
-./build/codebase-analyzer path/to/your/project
+./build/codebase_analyzer path/to/your/project
 ```
 
 On Windows, the executable may be inside `Debug` or `Release` depending on your generator:
 
 ```powershell
-.\build\Debug\codebase-analyzer.exe .
+.\build\Debug\codebase_analyzer.exe .
 ```
 
 or:
 
 ```powershell
-.\build\Release\codebase-analyzer.exe .
+.\build\Release\codebase_analyzer.exe .
 ```
 
 ---
