@@ -35,7 +35,9 @@
 
 Below is a quick video demonstration of the **Codebase Analyzer** (both Desktop UI and C++ CLI Core) in action:
 
-<video src="https://github.com/user-attachments/assets/2a8528f0-3679-4994-98d5-0709900a796f" width="100%" controls></video>
+<p align="center">
+    <video src="https://github.com/user-attachments/assets/2a8528f0-3679-4994-98d5-0709900a796f" width="800" autoplay loop muted playsinline></video>
+</p>
 
 ---
 
