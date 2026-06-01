@@ -42,7 +42,9 @@ ui_design/release/
 
 ## 🤖 Continuous Integration (GitHub Actions)
 
-We utilize automated GitHub Actions pipelines to generate cross-platform build artifacts.
+We utilize automated GitHub Actions pipelines to compile, test, and package our application for three major platforms (Windows, macOS, and Linux):
+1. 🖥️ **Desktop GUI App**: Platform-native installers/executables (`.exe`, `.dmg`, `.AppImage`) for use on personal machines ("máy chính").
+2. ⚙️ **C++ CLI Binaries**: Pre-compiled static command-line interface executables (`codebase-analyzer-cli-win.exe`, `codebase-analyzer-cli-mac`, `codebase-analyzer-cli-linux`) for direct command-line use on virtual machines ("máy ảo"), Docker containers, or headless servers.
 
 * 🚀 **CI Pipelines**: [GitHub Actions Dashboard](https://github.com/ThanhNguyn/Codebase-Analyzer/actions)
 * 📦 **Release Builds**: [Latest Release Packages](https://github.com/ThanhNguyn/Codebase-Analyzer/releases/latest)
