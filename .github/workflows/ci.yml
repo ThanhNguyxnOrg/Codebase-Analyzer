@@ -15,28 +15,28 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             artifact_name: codebase-analyzer-linux-x64
-            artifact_path: ui_design/release/codebase-analyzer-linux-x64.AppImage
+            artifact_glob: ui_design/release/*.AppImage
           - os: macos-13
             arch: x64
             artifact_name: codebase-analyzer-mac-x64
-            artifact_path: ui_design/release/codebase-analyzer-mac-x64.dmg
+            artifact_glob: ui_design/release/*.dmg
           - os: windows-latest
             arch: x64
             artifact_name: codebase-analyzer-win-x64
-            artifact_path: ui_design/release/codebase-analyzer-win-x64.exe
+            artifact_glob: ui_design/release/*.exe
           # ── arm64 (virtual machines) ──
           - os: ubuntu-24.04-arm
             arch: arm64
             artifact_name: codebase-analyzer-linux-arm64
-            artifact_path: ui_design/release/codebase-analyzer-linux-arm64.AppImage
+            artifact_glob: ui_design/release/*.AppImage
           - os: macos-latest
             arch: arm64
             artifact_name: codebase-analyzer-mac-arm64
-            artifact_path: ui_design/release/codebase-analyzer-mac-arm64.dmg
+            artifact_glob: ui_design/release/*.dmg
           - os: windows-latest
             arch: arm64
             artifact_name: codebase-analyzer-win-arm64
-            artifact_path: ui_design/release/codebase-analyzer-win-arm64.exe
+            artifact_glob: ui_design/release/*.exe
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -61,10 +61,14 @@ jobs:
           npm run build
           npx electron-builder --${{ matrix.arch }}
 
+      - name: List release output
+        working-directory: ui_design
+        run: Get-ChildItem release -Recurse -File | Select-Object FullName, Length
+
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          path: ${{ matrix.artifact_glob }}
           archive: false
           if-no-files-found: error
