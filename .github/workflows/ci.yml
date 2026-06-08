@@ -1,74 +1,52 @@
-name: desktop-build
+name: CI-Build
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  desktop:
+  build-tauri:
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          # ── x64 (regular machines) ──
           - os: ubuntu-latest
             arch: x64
-            artifact_name: codebase-analyzer-linux-x64
-            artifact_glob: ui_design/release/*.AppImage
           - os: macos-latest
             arch: x64
-            artifact_name: codebase-analyzer-mac-x64
-            artifact_glob: ui_design/release/*.dmg
           - os: windows-latest
             arch: x64
-            artifact_name: codebase-analyzer-win-x64
-            artifact_glob: ui_design/release/*.exe
-          # ── arm64 (virtual machines) ──
-          - os: ubuntu-24.04-arm
-            arch: arm64
-            artifact_name: codebase-analyzer-linux-arm64
-            artifact_glob: ui_design/release/*.AppImage
-          - os: macos-latest
-            arch: arm64
-            artifact_name: codebase-analyzer-mac-arm64
-            artifact_glob: ui_design/release/*.dmg
-          - os: windows-latest
-            arch: arm64
-            artifact_name: codebase-analyzer-win-arm64
-            artifact_glob: ui_design/release/*.exe
+
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: pwsh
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: ui_design/package-lock.json
 
-      - name: Install
-        working-directory: ui_design
-        run: npm ci
-
-      - name: Build & Package
-        working-directory: ui_design
-        run: |
-          npm run build
-          npx electron-builder --${{ matrix.arch }}
-
-      - name: List release output
-        working-directory: ui_design
-        run: Get-ChildItem release -Recurse -File | Select-Object FullName, Length
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_glob }}
-          archive: false
-          if-no-files-found: error
+          targets: ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || '' }}
+
+      - name: Install system dependencies (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Tauri App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run tauri build

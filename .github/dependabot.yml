@@ -1,0 +1,147 @@
+# Dependabot Configuration — Grouped Updates
+# Gom nhóm các dependency updates thay vì mỗi package 1 PR
+# Schedule: weekly, mỗi thứ Hai lúc 09:00 UTC+7
+
+version: 2
+updates:
+  # ─── Rust (Cargo) ───────────────────────────────────────
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(cargo):"
+    labels:
+      - dependencies
+      - rust
+    groups:
+      # Tauri core + plugins
+      tauri-ecosystem:
+        patterns:
+          - "tauri"
+          - "tauri-*"
+        update-types:
+          - minor
+          - patch
+      # Serde, serialization
+      serialization:
+        patterns:
+          - "serde"
+          - "serde_*"
+          - "csv"
+          - "handlebars"
+        update-types:
+          - minor
+          - patch
+      # Analysis engine deps
+      analysis-engine:
+        patterns:
+          - "tokei"
+          - "tree-sitter"
+          - "tree-sitter-*"
+          - "ignore"
+          - "walkdir"
+          - "rayon"
+          - "sha2"
+          - "gix"
+        update-types:
+          - minor
+          - patch
+      # All other minor/patch
+      rust-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # ─── npm (Frontend) ─────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(npm):"
+    labels:
+      - dependencies
+      - javascript
+    groups:
+      # React ecosystem
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-router*"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - minor
+          - patch
+      # Charting & Visualization
+      visualization:
+        patterns:
+          - "recharts"
+          - "d3"
+          - "d3-*"
+          - "react-arborist"
+        update-types:
+          - minor
+          - patch
+      # Tauri frontend API
+      tauri-api:
+        patterns:
+          - "@tauri-apps/*"
+        update-types:
+          - minor
+          - patch
+      # Dev tooling (vite, typescript, eslint, etc.)
+      dev-tooling:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "typescript"
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "prettier"
+          - "@types/*"
+        update-types:
+          - minor
+          - patch
+      # All other minor/patch
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # ─── GitHub Actions ─────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "02:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(actions):"
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions-all:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
