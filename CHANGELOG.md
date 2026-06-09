@@ -17,6 +17,8 @@ This major release introduces the **Asset Intelligence Engine (v2.0.0)**, expand
 - **Global Settings Synchronization**: Embedded visibility settings inside the global application context, syncing switches between Dashboard View Toolbar and Export Dialog Checkboxes.
 - **LocalStorage Persistence**: Auto-saves customize state to local storage, keeping user choices persistent across reloads.
 - **Dedicated Asset Panels**: Renders clean, standalone statistic cards on the Dashboard representing file counts, size summaries, and hints for each enabled category.
+- **Dynamic Stats Recalculation**: Recalculates all high-level dashboard metrics (`LINES OF CODE`, `FILES`, `LANGUAGES`), complexity indices, COCOMO estimation parameters, and code duplicates in real-time according to filter states.
+- **Synchronized Report Export**: Recalculates metrics, filters asset reports, and filters duplicate groups dynamically at the backend when downloading HTML, MD, CSV, or JSON reports, ensuring a 100% match with the dashboard.
 
 #### 📦 Asset Intelligence Engine
 - **Non-code Asset Discovery**: Scans, lists, and classifies all non-code assets in parallel using Rayon.
@@ -39,6 +41,10 @@ This major release introduces the **Asset Intelligence Engine (v2.0.0)**, expand
 #### 🧪 Test Separation & Automated README
 - **Separated Test Suite**: Split the monolithic asset test into dedicated files: `asset_multimedia_tests.rs`, `asset_game_tests.rs`, `asset_cad_tests.rs`, `asset_other_tests.rs`, and `techstack_game_cad_tests.rs`.
 - **Dynamic README stats**: Implemented automatic placeholders in `README.md` that are dynamically updated with the exact language count (currently 547) during compilation.
+- **Export Test Cases**: Added automated unit tests `export_tests.rs` to verify dynamic calculations when exporting reports (full options, exclude code, and exclude multimedia scenarios).
+
+#### 🔄 Update Checker
+- **Check for Updates Settings**: Integrated a client-side update checker in Settings that queries the public GitHub Releases API for the latest version and redirects the user to download the update.
 
 ---
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { C, mono, LANG_COLORS, TECH_CATEGORY_COLORS } from "./tokens";
 import { Card } from "./Card";
 import { useAnalysis } from "../hooks/useAnalysis";
@@ -22,7 +22,6 @@ export function Dashboard() {
     summary,
     cocomoRate,
     setCocomoRate,
-    cocomo,
     includeCode: showCode,
     includeMultimedia: showMultimedia,
     includeGame: showGame,
@@ -45,12 +44,216 @@ export function Dashboard() {
 
   const assetReport = summary.assetReport;
 
+  // Active files filtering based on visibility toggles
+  const allActiveFiles = useMemo(() => {
+    const list: any[] = [];
+
+    const getAssetCategory = (ext: string): string | null => {
+      const extLower = ext.toLowerCase();
+      const multimediaExts = ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "ico", "psd", "tiff", "tif", "ai", "heic", "heif", "mp4", "m4v", "mov", "avi", "mkv", "webm", "flv", "mp3", "wav", "ogg", "ogv", "oga", "flac", "aac", "m4a"];
+      const gameExts = ["fbx", "obj", "gltf", "glb", "blend", "stl", "dae", "tga", "dds", "meta", "prefab", "unity", "asset", "uasset", "umap", "uproject", "tscn", "tres", "gdns", "gdnlib", "import"];
+      const cadExts = ["dxf", "dwg", "step", "stp", "iges", "igs"];
+      const docExts = ["txt", "text", "md", "markdown", "pdf", "docx", "doc", "xlsx", "xls", "pptx", "ppt", "ttf", "otf", "woff", "woff2", "zip", "tar", "gz", "tgz", "7z", "rar", "sqlite", "db", "parquet", "arrow"];
+
+      if (multimediaExts.includes(extLower)) return "multimedia";
+      if (gameExts.includes(extLower)) return "game_3d";
+      if (cadExts.includes(extLower)) return "cad_drawing";
+      if (docExts.includes(extLower)) return "document";
+      return null;
+    };
+
+    const assetAsFileInfo = (a: any) => ({
+      name: a.name,
+      path: a.path,
+      lang: a.subcategory ? a.subcategory.toUpperCase() : "ASSET",
+      loc: 0,
+      code: 0,
+      comments: 0,
+      blanks: 0,
+      sizeBytes: a.size,
+      complexity: 0
+    });
+
+    // 1. Add files from code scan
+    if (showCode) {
+      summary.files.forEach(f => {
+        const ext = f.path.split('.').pop() || "";
+        const cat = getAssetCategory(ext);
+        if (cat === "multimedia" && !showMultimedia) return;
+        if (cat === "game_3d" && !showGame) return;
+        if (cat === "cad_drawing" && !showCad) return;
+        if (cat === "document" && !showDocuments) return;
+        list.push(f);
+      });
+    }
+
+    // 2. Add files from asset scan
+    if (summary.assetReport) {
+      summary.assetReport.assets.forEach(a => {
+        const cat = a.category;
+        const isDocRelated = ["document", "font", "archive", "data"].includes(cat);
+        
+        if (cat === "multimedia" && showMultimedia) {
+          list.push(assetAsFileInfo(a));
+        } else if (cat === "game_3d" && showGame) {
+          list.push(assetAsFileInfo(a));
+        } else if (cat === "cad_drawing" && showCad) {
+          list.push(assetAsFileInfo(a));
+        } else if (isDocRelated && showDocuments) {
+          list.push(assetAsFileInfo(a));
+        }
+      });
+    }
+
+    return list;
+  }, [summary, showCode, showMultimedia, showGame, showCad, showDocuments]);
+
+  // Recalculate languages stats dynamically
+  const activeLanguages = useMemo(() => {
+    const langGroups: Record<string, { files: number; code: number; comments: number; blanks: number }> = {};
+    let totalLoc = 0;
+
+    allActiveFiles.forEach(f => {
+      const loc = f.code + f.comments + f.blanks;
+      totalLoc += loc;
+      if (!langGroups[f.lang]) {
+        langGroups[f.lang] = { files: 0, code: 0, comments: 0, blanks: 0 };
+      }
+      langGroups[f.lang].files += 1;
+      langGroups[f.lang].code += f.code;
+      langGroups[f.lang].comments += f.comments;
+      langGroups[f.lang].blanks += f.blanks;
+    });
+
+    const list = Object.entries(langGroups).map(([name, stats]) => {
+      const loc = stats.code + stats.comments + stats.blanks;
+      const pct = totalLoc > 0 ? (loc / totalLoc) * 100 : 0;
+      return {
+        name,
+        files: stats.files,
+        code: stats.code,
+        comments: stats.comments,
+        blanks: stats.blanks,
+        pct,
+      };
+    });
+
+    list.sort((a, b) => (b.code + b.comments + b.blanks) - (a.code + a.comments + a.blanks));
+    return list;
+  }, [allActiveFiles]);
+
+  // Recalculate dynamic statistics
+  const dynamicStats = useMemo(() => {
+    const filesCount = allActiveFiles.length;
+    const locCount = allActiveFiles.reduce((sum, f) => sum + (f.code + f.comments + f.blanks), 0);
+    const langsCount = activeLanguages.length;
+
+    // Calculate COCOMO Organic mode
+    const kloc = locCount / 1000.0;
+    let effort = 0;
+    let devTime = 0;
+    let cost = 0;
+    if (kloc > 0) {
+      effort = 2.4 * Math.pow(kloc, 1.05);
+      devTime = 2.5 * Math.pow(effort, 0.38);
+      cost = effort * (cocomoRate * 1000.0);
+    }
+
+    return {
+      totalFiles: filesCount,
+      totalLoc: locCount,
+      totalLanguages: langsCount,
+      effort: Math.round(effort * 10) / 10,
+      devTime: Math.round(devTime * 10) / 10,
+      estimatedCostUsd: Math.round(cost),
+    };
+  }, [allActiveFiles, activeLanguages, cocomoRate]);
+
+  // Recalculate average complexity & complexity distribution
+  const dynamicComplexity = useMemo(() => {
+    let totalComplexity = 0.0;
+    const complexityDist = Array(10).fill(0);
+    let codeFilesCount = 0;
+
+    allActiveFiles.forEach(f => {
+      if (f.complexity !== undefined && f.loc > 0) { 
+        totalComplexity += f.complexity;
+        codeFilesCount += 1;
+
+        const compIdx = Math.min(9, (() => {
+          const val = f.complexity;
+          if (val <= 1) return 0;
+          if (val <= 3) return 1;
+          if (val <= 5) return 2;
+          if (val <= 7) return 3;
+          if (val <= 9) return 4;
+          if (val <= 12) return 5;
+          if (val <= 15) return 6;
+          if (val <= 18) return 7;
+          if (val <= 20) return 8;
+          return 9;
+        })());
+        complexityDist[compIdx] += 1;
+      }
+    });
+
+    const averageComplexity = codeFilesCount > 0 ? totalComplexity / codeFilesCount : 1.0;
+
+    return {
+      averageComplexity,
+      complexityDist,
+      codeFilesCount
+    };
+  }, [allActiveFiles]);
+
+  // Recalculate duplicates dynamically
+  const dynamicDuplicates = useMemo(() => {
+    if (!showCode) {
+      return { count: 0, groups: [] as string[][] };
+    }
+
+    const getAssetCategory = (ext: string): string | null => {
+      const extLower = ext.toLowerCase();
+      const multimediaExts = ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "ico", "psd", "tiff", "tif", "ai", "heic", "heif", "mp4", "m4v", "mov", "avi", "mkv", "webm", "flv", "mp3", "wav", "ogg", "ogv", "oga", "flac", "aac", "m4a"];
+      const gameExts = ["fbx", "obj", "gltf", "glb", "blend", "stl", "dae", "tga", "dds", "meta", "prefab", "unity", "asset", "uasset", "umap", "uproject", "tscn", "tres", "gdns", "gdnlib", "import"];
+      const cadExts = ["dxf", "dwg", "step", "stp", "iges", "igs"];
+      const docExts = ["txt", "text", "md", "markdown", "pdf", "docx", "doc", "xlsx", "xls", "pptx", "ppt", "ttf", "otf", "woff", "woff2", "zip", "tar", "gz", "tgz", "7z", "rar", "sqlite", "db", "parquet", "arrow"];
+
+      if (multimediaExts.includes(extLower)) return "multimedia";
+      if (gameExts.includes(extLower)) return "game_3d";
+      if (cadExts.includes(extLower)) return "cad_drawing";
+      if (docExts.includes(extLower)) return "document";
+      return null;
+    };
+
+    const isPathExcluded = (p: string) => {
+      const ext = p.split('.').pop() || "";
+      const cat = getAssetCategory(ext);
+      if (cat === "multimedia" && !showMultimedia) return true;
+      if (cat === "game_3d" && !showGame) return true;
+      if (cat === "cad_drawing" && !showCad) return true;
+      if (cat === "document" && !showDocuments) return true;
+      return false;
+    };
+
+    const filteredGroups = (summary.duplicateGroups || [])
+      .map(group => group.filter(p => !isPathExcluded(p)))
+      .filter(group => group.length > 1);
+
+    const count = filteredGroups.reduce((acc, group) => acc + group.length, 0);
+
+    return {
+      count,
+      groups: filteredGroups
+    };
+  }, [summary, showCode, showMultimedia, showGame, showCad, showDocuments]);
+
   // Extract directory name for breadcrumb
   const pathParts = summary.path.split(/[\\/]/);
   const projectName = pathParts[pathParts.length - 1] || summary.path;
 
   // Est. Cost from COCOMO
-  const estCostStr = cocomo ? `$${fmt(cocomo.estimatedCostUsd)}` : "—";
+  const estCostStr = dynamicStats.estimatedCostUsd ? `$${fmt(dynamicStats.estimatedCostUsd)}` : "—";
 
   return (
     <div className="px-10 py-8 h-full overflow-y-auto">
@@ -137,13 +340,13 @@ export function Dashboard() {
                 fontWeight: 500,
               }}
             >
-              {fmt(summary.totalLoc)}
+              {fmt(dynamicStats.totalLoc)}
             </div>
 
             <div className="flex gap-8" style={{ marginTop: 24 }}>
               {[
-                { v: fmt(summary.totalFiles), l: "FILES" },
-                { v: summary.totalLanguages, l: "LANGUAGES" },
+                { v: fmt(dynamicStats.totalFiles), l: "FILES" },
+                { v: dynamicStats.totalLanguages, l: "LANGUAGES" },
                 { v: estCostStr, l: "EST. COST" },
               ].map((it) => (
                 <div key={it.l}>
@@ -195,7 +398,7 @@ export function Dashboard() {
                   border: `1px solid ${C.border}`,
                 }}
               >
-                {summary.languages.map((l) => (
+                {activeLanguages.map((l) => (
                   <div
                     key={l.name}
                     onMouseEnter={() => setHover(l.name)}
@@ -220,8 +423,8 @@ export function Dashboard() {
                 }}
               >
                 {hover
-                  ? `${hover} — ${summary.languages.find((l) => l.name === hover)?.pct.toFixed(1)}% · ${fmt(
-                      summary.languages.find((l) => l.name === hover)?.code || 0,
+                  ? `${hover} — ${activeLanguages.find((l) => l.name === hover)?.pct.toFixed(1)}% · ${fmt(
+                      activeLanguages.find((l) => l.name === hover)?.code || 0,
                     )} loc`
                   : "hover a segment for details"}
               </div>
@@ -249,7 +452,7 @@ export function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {summary.languages.map((l, i) => (
+                  {activeLanguages.map((l, i) => (
                     <tr
                       key={l.name}
                       style={{
@@ -381,14 +584,14 @@ export function Dashboard() {
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                {summary.averageComplexity.toFixed(1)}
+                {dynamicComplexity.averageComplexity.toFixed(1)}
               </div>
               <div style={{ ...mono, fontSize: 10, color: C.muted, marginTop: 4 }}>
                 average · cyclomatic
               </div>
               <div className="flex items-end gap-1" style={{ marginTop: 18, height: 36 }}>
-                {summary.complexityDist.map((v, i) => {
-                  const maxVal = Math.max(...summary.complexityDist);
+                {dynamicComplexity.complexityDist.map((v, i) => {
+                  const maxVal = Math.max(...dynamicComplexity.complexityDist);
                   const heightPct = maxVal > 0 ? (v / maxVal) * 100 : 0;
                   return (
                     <div
@@ -416,13 +619,13 @@ export function Dashboard() {
               <div className="flex justify-between" style={{ marginBottom: 10 }}>
                 <span style={{ fontSize: 12, color: C.muted }}>Effort</span>
                 <span style={{ ...mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>
-                  {cocomo ? cocomo.effortPersonMonths : "—"} person-months
+                  {dynamicStats.effort} person-months
                 </span>
               </div>
               <div className="flex justify-between" style={{ marginBottom: 10 }}>
                 <span style={{ fontSize: 12, color: C.muted }}>Time</span>
                 <span style={{ ...mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>
-                  {cocomo ? cocomo.developmentTimeMonths : "—"} months
+                  {dynamicStats.devTime} months
                 </span>
               </div>
               <div className="flex justify-between" style={{ marginBottom: 14 }}>
@@ -436,7 +639,7 @@ export function Dashboard() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  {cocomo ? `$${fmt(cocomo.estimatedCostUsd)}` : "—"}
+                  {dynamicStats.estimatedCostUsd ? `$${fmt(dynamicStats.estimatedCostUsd)}` : "—"}
                 </span>
               </div>
               <div
@@ -475,13 +678,13 @@ export function Dashboard() {
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
-                    {summary.duplicates}
+                    {dynamicDuplicates.count}
                   </span>
                   <span style={{ fontSize: 12, color: C.muted, marginLeft: 8 }}>
                     duplicate files
                   </span>
                 </div>
-                {summary.duplicates > 0 && (
+                {dynamicDuplicates.count > 0 && (
                   <button
                     onClick={() => setShowDuplicates(!showDuplicates)}
                     style={{
@@ -500,12 +703,12 @@ export function Dashboard() {
                 )}
               </div>
 
-              {showDuplicates && summary.duplicateGroups.length > 0 && (
+              {showDuplicates && dynamicDuplicates.groups.length > 0 && (
                 <div 
                   className="mt-4 pt-3 border-t border-white/[0.08] overflow-y-auto max-h-48"
                   style={{ ...mono, fontSize: 11 }}
                 >
-                  {summary.duplicateGroups.map((group, gIdx) => (
+                  {dynamicDuplicates.groups.map((group, gIdx) => (
                     <div key={gIdx} className="mb-3 last:mb-0">
                       <div style={{ color: C.accent }}>Group #{gIdx + 1}</div>
                       {group.map((p, pIdx) => (

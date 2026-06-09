@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useAnalysis } from "../hooks/useAnalysis";
 import { C, mono } from "./tokens";
 import { Save, RefreshCw, FileCode, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 export function Settings({ onNavigateToDashboard }: { onNavigateToDashboard: () => void }) {
   const { summary, scanFolder } = useAnalysis();
@@ -332,13 +333,129 @@ export function Settings({ onNavigateToDashboard }: { onNavigateToDashboard: () 
             </ul>
           </div>
 
-          <div className="border-t pt-4 mt-auto" style={{ borderColor: C.border }}>
+          <div className="border-t pt-4 mt-auto flex flex-col gap-4" style={{ borderColor: C.border }}>
+            <UpdateChecker />
+            
             <div className="p-3.5 rounded bg-amber-500/5 border border-amber-500/10 text-xs text-amber-500/90 leading-relaxed">
               <strong>Tip:</strong> Re-scanning will overwrite the cache data. This ensures your dashboard statistics remain perfectly accurate and up-to-date.
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function UpdateChecker() {
+  const [checking, setChecking] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<{
+    status: "idle" | "latest" | "available" | "error";
+    version?: string;
+    url?: string;
+    errorMsg?: string;
+  }>({ status: "idle" });
+
+  const currentVersion = "2.0.0"; // Current version of the app
+
+  const handleCheckUpdate = async () => {
+    setChecking(true);
+    setUpdateInfo({ status: "idle" });
+    try {
+      const response = await fetch("https://api.github.com/repos/ThanhNguyxnOrg/Locsight/releases/latest");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch release: HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      const latestTag = data.tag_name;
+      const cleanLatest = latestTag.replace(/^v/, "");
+      
+      if (cleanLatest !== currentVersion) {
+        setUpdateInfo({
+          status: "available",
+          version: latestTag,
+          url: data.html_url
+        });
+      } else {
+        setUpdateInfo({ status: "latest" });
+      }
+    } catch (err: any) {
+      setUpdateInfo({
+        status: "error",
+        errorMsg: err.message || "Unknown network error"
+      });
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  return (
+    <div className="p-4 rounded border flex flex-col gap-3" style={{ borderColor: C.border, background: "rgba(255, 255, 255, 0.01)" }}>
+      <h4 className="text-xs font-bold flex items-center justify-between">
+        <span style={{ color: C.text }}>SOFTWARE UPDATE</span>
+        <span style={{ ...mono, fontSize: 9, color: C.muted }}>v{currentVersion}</span>
+      </h4>
+      
+      {updateInfo.status === "idle" && !checking && (
+        <button
+          onClick={handleCheckUpdate}
+          className="w-full py-1.5 rounded text-xs font-semibold border flex items-center justify-center gap-2 transition cursor-pointer"
+          style={{ borderColor: C.border, background: C.surface, color: C.text }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = C.accent}
+          onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+        >
+          Check for Updates
+        </button>
+      )}
+
+      {checking && (
+        <div className="flex items-center justify-center gap-2 py-1.5 text-xs text-neutral-400">
+          <RefreshCw className="animate-spin text-amber-500" size={13} />
+          <span>Checking GitHub...</span>
+        </div>
+      )}
+
+      {updateInfo.status === "latest" && (
+        <div className="text-xs text-emerald-400 py-1 flex flex-col gap-1">
+          <div className="font-semibold">✓ Locsight is up to date!</div>
+          <div className="text-[10px] text-neutral-500">You are on the latest version.</div>
+          <button
+            onClick={handleCheckUpdate}
+            className="mt-1 text-[10px] text-neutral-400 hover:text-white underline text-left"
+          >
+            Check again
+          </button>
+        </div>
+      )}
+
+      {updateInfo.status === "available" && (
+        <div className="text-xs text-amber-400 py-1 flex flex-col gap-2">
+          <div className="font-semibold">⚠️ New version {updateInfo.version} is available!</div>
+          <button
+            onClick={() => {
+              if (updateInfo.url) {
+                openUrl(updateInfo.url).catch(console.error);
+              }
+            }}
+            className="w-full py-1.5 rounded text-xs font-bold text-black flex items-center justify-center gap-1.5 transition cursor-pointer"
+            style={{ background: C.accent }}
+          >
+            Download Update
+          </button>
+        </div>
+      )}
+
+      {updateInfo.status === "error" && (
+        <div className="text-xs text-red-400 py-1 flex flex-col gap-1">
+          <div className="font-semibold">Failed to check updates</div>
+          <div className="text-[10px] text-neutral-500 truncate" title={updateInfo.errorMsg}>{updateInfo.errorMsg}</div>
+          <button
+            onClick={handleCheckUpdate}
+            className="mt-1 text-[10px] text-neutral-400 hover:text-white underline text-left"
+          >
+            Try again
+          </button>
+        </div>
+      )}
     </div>
   );
 }

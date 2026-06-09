@@ -1,7 +1,8 @@
 use std::fs::File;
 use std::io::Write;
-use crate::models::ProjectSummary;
+use crate::models::{ProjectSummary, LanguageStats};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -20,87 +21,214 @@ pub async fn export_report(
     mut summary: ProjectSummary,
     options: ExportOptions,
 ) -> Result<(), String> {
-    let content = match format.to_lowercase().as_str() {
-        "json" => {
-            // Filter summary fields based on options before JSON serialization
-            if !options.include_code {
-                summary.files = vec![];
-                summary.languages = vec![];
-                summary.total_files = 0;
-                summary.total_loc = 0;
-                summary.total_code = 0;
-                summary.total_comments = 0;
-                summary.total_blanks = 0;
-                summary.average_complexity = 0.0;
-                summary.complexity_dist = vec![];
+    // 1. Filter code files based on options
+    let is_ext_excluded = |ext: &str| -> bool {
+        if let Some(cfg) = crate::engine::assets::get_asset_config(ext) {
+            let is_multimedia = cfg.category == "multimedia";
+            let is_game = cfg.category == "game_3d";
+            let is_cad = cfg.category == "cad_drawing";
+            let is_doc = cfg.category == "document" || cfg.category == "font" || cfg.category == "archive" || cfg.category == "data";
+
+            if is_multimedia && !options.include_multimedia {
+                return true;
             }
-            if !options.include_multimedia || !options.include_game || !options.include_cad || !options.include_documents {
-                if let Some(ref mut ar) = summary.asset_report {
-                    ar.assets.retain(|a| {
-                        let is_multimedia = a.category == "multimedia";
-                        let is_game = a.category == "game_3d";
-                        let is_cad = a.category == "cad_drawing";
-                        let is_doc = a.category == "document" || a.category == "font" || a.category == "archive" || a.category == "data";
+            if is_game && !options.include_game {
+                return true;
+            }
+            if is_cad && !options.include_cad {
+                return true;
+            }
+            if is_doc && !options.include_documents {
+                return true;
+            }
+        }
+        false
+    };
 
-                        (is_multimedia && options.include_multimedia)
-                            || (is_game && options.include_game)
-                            || (is_cad && options.include_cad)
-                            || (is_doc && options.include_documents)
-                    });
-                    
-                    ar.orphans.retain(|o| {
-                        let is_multimedia = o.category == "multimedia";
-                        let is_game = o.category == "game_3d";
-                        let is_cad = o.category == "cad_drawing";
-                        let is_doc = o.category == "document" || o.category == "font" || o.category == "archive" || o.category == "data";
-
-                        (is_multimedia && options.include_multimedia)
-                            || (is_game && options.include_game)
-                            || (is_cad && options.include_cad)
-                            || (is_doc && options.include_documents)
-                    });
-
-                    ar.duplicates.retain(|d| {
-                        if d.files.is_empty() {
-                            return false;
-                        }
-                        if let Some(ext) = d.files[0].split('.').last() {
-                            let ext_lower = ext.to_lowercase();
-                            if let Some(cfg) = crate::engine::assets::get_asset_config(&ext_lower) {
-                                let is_multimedia = cfg.category == "multimedia";
-                                let is_game = cfg.category == "game_3d";
-                                let is_cad = cfg.category == "cad_drawing";
-                                let is_doc = cfg.category == "document" || cfg.category == "font" || cfg.category == "archive" || cfg.category == "data";
-
-                                return (is_multimedia && options.include_multimedia)
-                                    || (is_game && options.include_game)
-                                    || (is_cad && options.include_cad)
-                                    || (is_doc && options.include_documents);
-                            }
-                        }
-                        true
-                    });
-
-                    ar.optimization_hints.retain(|h| {
-                        if let Some(ext) = h.path.split('.').last() {
-                            let ext_lower = ext.to_lowercase();
-                            if let Some(cfg) = crate::engine::assets::get_asset_config(&ext_lower) {
-                                let is_multimedia = cfg.category == "multimedia";
-                                let is_game = cfg.category == "game_3d";
-                                let is_cad = cfg.category == "cad_drawing";
-                                let is_doc = cfg.category == "document" || cfg.category == "font" || cfg.category == "archive" || cfg.category == "data";
-
-                                return (is_multimedia && options.include_multimedia)
-                                    || (is_game && options.include_game)
-                                    || (is_cad && options.include_cad)
-                                    || (is_doc && options.include_documents);
-                            }
-                        }
-                        true
-                    });
+    let mut active_files = Vec::new();
+    if options.include_code {
+        for f in summary.files {
+            if let Some(ext) = f.path.split('.').last() {
+                let ext_lower = ext.to_lowercase();
+                if is_ext_excluded(&ext_lower) {
+                    continue;
                 }
             }
+            active_files.push(f);
+        }
+    }
+    summary.files = active_files;
 
+    // 2. Filter asset report
+    if let Some(ref mut ar) = summary.asset_report {
+        ar.assets.retain(|a| {
+            let is_multimedia = a.category == "multimedia";
+            let is_game = a.category == "game_3d";
+            let is_cad = a.category == "cad_drawing";
+            let is_doc = a.category == "document" || a.category == "font" || a.category == "archive" || a.category == "data";
+
+            (is_multimedia && options.include_multimedia)
+                || (is_game && options.include_game)
+                || (is_cad && options.include_cad)
+                || (is_doc && options.include_documents)
+        });
+
+        ar.orphans.retain(|o| {
+            let is_multimedia = o.category == "multimedia";
+            let is_game = o.category == "game_3d";
+            let is_cad = o.category == "cad_drawing";
+            let is_doc = o.category == "document" || o.category == "font" || o.category == "archive" || o.category == "data";
+
+            (is_multimedia && options.include_multimedia)
+                || (is_game && options.include_game)
+                || (is_cad && options.include_cad)
+                || (is_doc && options.include_documents)
+        });
+
+        ar.duplicates.retain(|d| {
+            if d.files.is_empty() {
+                return false;
+            }
+            if let Some(ext) = d.files[0].split('.').last() {
+                let ext_lower = ext.to_lowercase();
+                if is_ext_excluded(&ext_lower) {
+                    return false;
+                }
+            }
+            true
+        });
+
+        ar.optimization_hints.retain(|h| {
+            if let Some(ext) = h.path.split('.').last() {
+                let ext_lower = ext.to_lowercase();
+                if is_ext_excluded(&ext_lower) {
+                    return false;
+                }
+            }
+            true
+        });
+    }
+
+    // 3. Recalculate statistics
+    let mut total_code = 0;
+    let mut total_comments = 0;
+    let mut total_blanks = 0;
+    let mut lang_groups: HashMap<String, (u32, u64, u64, u64)> = HashMap::new();
+
+    for f in &summary.files {
+        total_code += f.code;
+        total_comments += f.comments;
+        total_blanks += f.blanks;
+
+        let entry = lang_groups
+            .entry(f.lang.clone())
+            .or_insert((0, 0, 0, 0));
+        entry.0 += 1;
+        entry.1 += f.code;
+        entry.2 += f.comments;
+        entry.3 += f.blanks;
+    }
+
+    if let Some(ref ar) = summary.asset_report {
+        for a in &ar.assets {
+            let cat = &a.category;
+            let is_doc_related = cat == "document" || cat == "font" || cat == "archive" || cat == "data";
+            
+            let should_add = (cat == "multimedia" && options.include_multimedia)
+                || (cat == "game_3d" && options.include_game)
+                || (cat == "cad_drawing" && options.include_cad)
+                || (is_doc_related && options.include_documents);
+
+            if should_add {
+                let lang_name = a.subcategory.to_uppercase();
+                let entry = lang_groups
+                    .entry(lang_name)
+                    .or_insert((0, 0, 0, 0));
+                entry.0 += 1;
+            }
+        }
+    }
+
+    summary.total_files = summary.files.len() as u32;
+    if let Some(ref ar) = summary.asset_report {
+        summary.total_files += ar.assets.len() as u32;
+    }
+    
+    summary.total_code = total_code;
+    summary.total_comments = total_comments;
+    summary.total_blanks = total_blanks;
+    summary.total_loc = total_code + total_comments + total_blanks;
+
+    // Recalculate duplicates based on active code files
+    if !options.include_code {
+        summary.duplicates = 0;
+        summary.duplicate_groups = Vec::new();
+    } else {
+        let mut active_paths = std::collections::HashSet::new();
+        for f in &summary.files {
+            active_paths.insert(f.path.clone());
+        }
+
+        let mut filtered_groups = Vec::new();
+        for group in summary.duplicate_groups {
+            let filtered_group: Vec<String> = group
+                .into_iter()
+                .filter(|p| active_paths.contains(p))
+                .collect();
+            if filtered_group.len() > 1 {
+                filtered_groups.push(filtered_group);
+            }
+        }
+
+        summary.duplicates = filtered_groups.iter().map(|g| g.len() as u32).sum();
+        summary.duplicate_groups = filtered_groups;
+    }
+
+    let total_loc_f64 = summary.total_loc as f64;
+    let mut languages: Vec<LanguageStats> = lang_groups
+        .into_iter()
+        .map(|(name, (files, code, comments, blanks))| {
+            let pct = if total_loc_f64 > 0.0 {
+                ((code + comments + blanks) as f64 / total_loc_f64) * 100.0
+            } else {
+                0.0
+            };
+            LanguageStats { name, files, code, comments, blanks, pct }
+        })
+        .collect();
+
+    languages.sort_by(|a, b| (b.code + b.comments + b.blanks).cmp(&(a.code + a.comments + a.blanks)));
+    summary.languages = languages;
+    summary.total_languages = summary.languages.len() as u32;
+
+    // Recalculate average complexity & complexity distribution
+    let mut total_complexity = 0.0;
+    let mut complexity_dist = vec![0u32; 10];
+    for f in &summary.files {
+        total_complexity += f.complexity;
+        let comp_idx = match f.complexity as u32 {
+            0..=1 => 0,
+            2..=3 => 1,
+            4..=5 => 2,
+            6..=7 => 3,
+            8..=9 => 4,
+            10..=12 => 5,
+            13..=15 => 6,
+            16..=18 => 7,
+            19..=20 => 8,
+            _ => 9,
+        };
+        complexity_dist[comp_idx] += 1;
+    }
+    summary.average_complexity = if !summary.files.is_empty() {
+        total_complexity / summary.files.len() as f64
+    } else {
+        1.0
+    };
+    summary.complexity_dist = complexity_dist;
+
+    let content = match format.to_lowercase().as_str() {
+        "json" => {
             serde_json::to_string_pretty(&summary)
                 .map_err(|e| format!("Failed to generate JSON: {}", e))?
         }
