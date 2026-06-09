@@ -65,6 +65,7 @@ jobs:
             echo "| 🍎 macOS | Apple Silicon (ARM64) | \`.dmg\` |"
             echo "| 🍎 macOS | Intel (x64) | \`.dmg\` |"
             echo "| 🐧 Linux | x64 | \`.deb\` / \`.AppImage\` |"
+            echo "| 🐧 Linux | ARM64 | \`.deb\` / \`.AppImage\` |"
           } > release_body.md
 
       - name: Create and push tag
@@ -85,7 +86,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ── Job 2: Build on 5 targets and upload artifacts to release ──
+  # ── Job 2: Build on 6 targets and upload artifacts to release ──
   build-tauri:
     needs: create-release
     permissions:
@@ -109,6 +110,9 @@ jobs:
           - platform: ubuntu-22.04
             args: ''
             rust_target: ''
+          - platform: ubuntu-22.04-arm
+            args: ''
+            rust_target: ''
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -130,7 +134,7 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: Install system dependencies (Linux)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: startsWith(matrix.platform, 'ubuntu-')
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
