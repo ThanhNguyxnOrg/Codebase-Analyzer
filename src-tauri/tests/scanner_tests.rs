@@ -172,3 +172,14 @@ fn test_all_shebang_detections() {
 
     let _ = std::fs::remove_dir_all(&temp_dir);
 }
+
+#[test]
+fn test_gdscript_line_counting() {
+    let config = get_language_config_by_name("GDScript")
+        .expect("GDScript config should exist");
+    let content = "# This is a comment\nextends Node2D\n\nfunc _ready():\n    pass # inline comment";
+    let (code, comments, blanks, _) = count_lines(content, &config);
+    assert_eq!(code, 3);
+    assert_eq!(comments, 1);
+    assert_eq!(blanks, 1);
+}

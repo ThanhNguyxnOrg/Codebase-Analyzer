@@ -1,22 +1,23 @@
 import { useState, useEffect } from "react";
-import { Home, LayoutDashboard, FolderTree, Share2, Download, Minus, Square, X, Activity, ShieldAlert, History, Maximize2, Settings, FolderOpen, Bug } from "lucide-react";
+import { Home, LayoutDashboard, FolderTree, Boxes, Share2, Download, Minus, Square, X, Activity, ShieldAlert, History, Maximize2, Settings, FolderOpen, Bug } from "lucide-react";
 import { C, mono } from "./tokens";
 import { useAnalysis } from "../hooks/useAnalysis";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 // Add "settings" to the available screens
-export type Screen = "welcome" | "dashboard" | "files" | "graph" | "health" | "insights" | "git" | "export" | "settings";
+export type Screen = "welcome" | "dashboard" | "files" | "assets" | "graph" | "health" | "insights" | "git" | "export" | "settings";
 
 const ITEMS: { id: Screen; icon: any; label: string; key: string }[] = [
   { id: "welcome", icon: Home, label: "Home", key: "1" },
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", key: "2" },
   { id: "files", icon: FolderTree, label: "Files", key: "3" },
-  { id: "graph", icon: Share2, label: "Graph", key: "4" },
-  { id: "health", icon: Activity, label: "Health", key: "5" },
-  { id: "insights", icon: ShieldAlert, label: "Insights", key: "6" },
-  { id: "git", icon: History, label: "Git", key: "7" },
-  { id: "export", icon: Download, label: "Export", key: "8" },
+  { id: "assets", icon: Boxes, label: "Assets", key: "4" },
+  { id: "graph", icon: Share2, label: "Graph", key: "5" },
+  { id: "health", icon: Activity, label: "Health", key: "6" },
+  { id: "insights", icon: ShieldAlert, label: "Insights", key: "7" },
+  { id: "git", icon: History, label: "Git", key: "8" },
+  { id: "export", icon: Download, label: "Export", key: "9" },
 ];
 
 export function Shell({
@@ -453,7 +454,7 @@ export function Shell({
               padding: "8px 0",
             }}
           >
-            v1.2.0
+            v2.0.0
           </div>
         </nav>
 

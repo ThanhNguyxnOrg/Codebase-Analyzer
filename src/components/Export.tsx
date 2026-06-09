@@ -18,7 +18,20 @@ interface ExportHistoryItem {
 }
 
 export function Export() {
-  const { summary, exportSummaryReport } = useAnalysis();
+  const {
+    summary,
+    exportSummaryReport,
+    includeCode,
+    includeMultimedia,
+    includeGame,
+    includeCad,
+    includeDocuments,
+    updateIncludeCode: setIncludeCode,
+    updateIncludeMultimedia: setIncludeMultimedia,
+    updateIncludeGame: setIncludeGame,
+    updateIncludeCad: setIncludeCad,
+    updateIncludeDocuments: setIncludeDocuments,
+  } = useAnalysis();
   const [history, setHistory] = useState<ExportHistoryItem[]>([]);
   const [status, setStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
@@ -52,7 +65,13 @@ export function Export() {
       });
 
       if (filePath) {
-        await exportSummaryReport(filePath, formatId.toLowerCase());
+        await exportSummaryReport(filePath, formatId.toLowerCase(), {
+          includeCode,
+          includeMultimedia,
+          includeGame,
+          includeCad,
+          includeDocuments
+        });
         
         // Add to history
         const newHistItem: ExportHistoryItem = {
@@ -86,8 +105,62 @@ export function Export() {
       >
         EXPORT REPORT
       </div>
-      <div style={{ fontSize: 14, color: C.muted, marginBottom: 24 }}>
+      <div style={{ fontSize: 14, color: C.muted, marginBottom: 18 }}>
         Choose a format. Export saves a complete report file containing stats and data.
+      </div>
+
+      {/* Export Section Customizer */}
+      <div className="mb-6 p-4 rounded border flex flex-col gap-3" style={{ borderColor: C.border, background: C.surface }}>
+        <div style={{ ...mono, fontSize: 10, color: C.muted, letterSpacing: "0.08em" }}>
+          SELECT SECTIONS TO INCLUDE IN REPORT
+        </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
+          <label className="flex items-center gap-2 cursor-pointer text-white/90 hover:text-white select-none">
+            <input
+              type="checkbox"
+              checked={includeCode}
+              onChange={(e) => setIncludeCode(e.target.checked)}
+              className="accent-amber-500 rounded border-zinc-700 bg-black"
+            />
+            <span>Code Analysis (Rust, C++, etc.)</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-white/90 hover:text-white select-none">
+            <input
+              type="checkbox"
+              checked={includeMultimedia}
+              onChange={(e) => setIncludeMultimedia(e.target.checked)}
+              className="accent-amber-500 rounded border-zinc-700 bg-black"
+            />
+            <span>Multimedia (Images, Video, Audio)</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-white/90 hover:text-white select-none">
+            <input
+              type="checkbox"
+              checked={includeGame}
+              onChange={(e) => setIncludeGame(e.target.checked)}
+              className="accent-amber-500 rounded border-zinc-700 bg-black"
+            />
+            <span>Game & 3D (Models, Prefabs, Textures)</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-white/90 hover:text-white select-none">
+            <input
+              type="checkbox"
+              checked={includeCad}
+              onChange={(e) => setIncludeCad(e.target.checked)}
+              className="accent-amber-500 rounded border-zinc-700 bg-black"
+            />
+            <span>CAD Drawings (DXF, DWG, STEP, IGES)</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-white/90 hover:text-white select-none">
+            <input
+              type="checkbox"
+              checked={includeDocuments}
+              onChange={(e) => setIncludeDocuments(e.target.checked)}
+              className="accent-amber-500 rounded border-zinc-700 bg-black"
+            />
+            <span>Documents & Others (Docs, Databases, Fonts)</span>
+          </label>
+        </div>
       </div>
 
       {status && (

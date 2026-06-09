@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use super::file_info::FileInfo;
 use super::language_stats::LanguageStats;
+use super::asset_report::AssetReport;
 use crate::engine::roles::RoleStats;
 use crate::engine::annotations::Annotation;
 use crate::engine::secrets::SecretFinding;
@@ -36,5 +37,6 @@ pub struct ProjectSummary {
     pub file_churn: Vec<FileChurn>,
     pub top_contributors: Vec<Contributor>,
     pub tech_stack: Vec<crate::engine::techstack::TechStackItem>,
+    pub asset_report: Option<AssetReport>,
 }
 

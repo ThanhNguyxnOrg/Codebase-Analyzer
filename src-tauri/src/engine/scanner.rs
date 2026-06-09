@@ -16,6 +16,7 @@ use super::secrets::{self, SecretFinding};
 use super::git;
 use super::config;
 use super::techstack;
+use super::assets;
 
 
 #[derive(Clone, Copy)]
@@ -505,6 +506,7 @@ pub fn scan_project_directory(root_path: &str) -> Result<ProjectSummary, String>
     let matcher = IgnoreMatcher::new(&ignore_rules);
 
     let mut files_to_scan = Vec::new();
+    let mut assets_to_scan = Vec::new();
 
     for entry in WalkDir::new(root).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
@@ -512,6 +514,10 @@ pub fn scan_project_directory(root_path: &str) -> Result<ProjectSummary, String>
             if !should_ignore(path, root, &matcher) {
                 if get_file_language_config(path, &custom_cfg).is_some() {
                     files_to_scan.push(path.to_path_buf());
+                } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                    if assets::get_asset_config(ext).is_some() {
+                        assets_to_scan.push(path.to_path_buf());
+                    }
                 }
             }
         }
@@ -687,6 +693,8 @@ pub fn scan_project_directory(root_path: &str) -> Result<ProjectSummary, String>
 
     let tech_stack = techstack::detect_tech_stack(root);
 
+    let asset_report = assets::scan_assets(&assets_to_scan, root, &files_to_scan);
+
     let scan_duration_ms = start_time.elapsed().as_millis() as u64;
 
     Ok(ProjectSummary {
@@ -716,6 +724,7 @@ pub fn scan_project_directory(root_path: &str) -> Result<ProjectSummary, String>
         file_churn,
         top_contributors,
         tech_stack,
+        asset_report: Some(asset_report),
     })
 }
 

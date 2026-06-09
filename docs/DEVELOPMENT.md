@@ -65,6 +65,7 @@ Locsight/
 │   │   ├── Insights.tsx            # Secrets + TODOs
 │   │   ├── Git.tsx                 # Churn analysis
 │   │   ├── Files.tsx               # File tree + treemap
+│   │   ├── Assets.tsx              # Non-code assets intelligence dashboard
 │   │   ├── Graph.tsx               # Dependency graph
 │   │   ├── Export.tsx              # Report generation
 │   │   ├── Card.tsx                # Reusable card
@@ -75,12 +76,16 @@ Locsight/
 │   │   └── index.ts                # TypeScript interfaces
 │   └── App.tsx                     # Root component
 ├── 📂 src-tauri/                   # 🦀 Rust Backend
+│   ├── 📄 assets.toml              # Non-code assets config mapping
+│   ├── 📄 languages.toml           # 500+ language config mapping
+│   ├── 📄 techstack.toml           # Techstack framework detection
 │   ├── 📂 src/
 │   │   ├── lib.rs                  # Tauri plugin setup
 │   │   ├── main.rs                 # Entry point
 │   │   ├── 📂 commands/            # IPC command handlers
 │   │   ├── 📂 engine/              # Core analysis engines
-│   │   │   ├── scanner.rs          # 250+ lang file walker
+│   │   │   ├── scanner.rs          # 500+ lang file walker
+│   │   │   ├── assets.rs           # Asset scanner & metadata parser
 │   │   │   ├── complexity.rs       # Cyclomatic analysis
 │   │   │   ├── cocomo.rs           # Cost estimation
 │   │   │   ├── duplicate.rs        # SHA-256 dedup
@@ -91,6 +96,9 @@ Locsight/
 │   │   │   ├── git.rs              # Git history analysis
 │   │   │   └── config.rs           # Custom rules parser
 │   │   └── 📂 models/              # Data structures
+│   │   │   ├── asset_report.rs     # Asset structure model
+│   │   │   └── ...                 # Other models
+│   │   └── ...
 │   └── Cargo.toml
 └── 📄 package.json
 ```
@@ -110,8 +118,9 @@ Expected output:
 ```
 test engine::scanner::tests::test_count_lines_python ... ok
 test engine::scanner::tests::test_count_lines_rust ... ok
-test engine::scanner::tests::test_shebang_detection ... ok
-test result: ok. 3 passed; 0 failed
+test test_get_asset_config ... ok
+test test_scan_assets_basic ... ok
+test result: ok. 4 passed; 0 failed
 ```
 
 ### ⚛️ Frontend Type Check

@@ -16,6 +16,7 @@ graph TB
             I["🔐 Insights"]
             G["🔥 Git"]
             F["📁 Files"]
+            AS_FE["📦 Assets"]
             GR["🕸️ Graph"]
             E["📄 Export"]
         end
@@ -31,6 +32,7 @@ graph TB
             CO["💰 COCOMO"]
             DU["🔁 Duplicate Finder"]
             CF["⚙️ Config Parser"]
+            AS_BE["📦 Asset Scanner"]
         end
 
         frontend -- "IPC invoke()" --> backend
@@ -57,15 +59,18 @@ flowchart LR
     E --> H["📝 Scan annotations"]
     E --> I["🔐 Scan secrets"]
     E --> J["🏷️ Classify role"]
+    E --> J2["📦 Scan assets & configs"]
 
     F & G & H & I & J --> K["📦 Post-scan aggregation"]
+    J2 --> K
 
     K --> L["🧮 Complexity analysis"]
     K --> M["🔁 SHA-256 dedup"]
     K --> N["📊 Git log churn"]
     K --> O["💰 COCOMO estimate"]
+    K --> O2["📦 Asset relations & hints"]
 
-    L & M & N & O --> P["📋 ProjectSummary"]
+    L & M & N & O & O2 --> P["📋 ProjectSummary"]
     P --> Q["⚛️ React Context"]
     Q --> R["🖥️ All UI Screens"]
 ```
@@ -78,7 +83,7 @@ flowchart LR
 
 | Module | File | Purpose |
 |:---|:---|:---|
-| 🔍 **Scanner** | `engine/scanner.rs` | Multi-threaded file walker with 250+ language support, shebang detection, and line counting |
+| 🔍 **Scanner** | `engine/scanner.rs` | Multi-threaded file walker with 500+ language support, shebang detection, and line counting |
 | 🧮 **Complexity** | `engine/complexity.rs` | Cyclomatic complexity via keyword-based branching analysis |
 | 💰 **COCOMO** | `engine/cocomo.rs` | COCOMO II cost/effort/schedule estimation |
 | 🔁 **Duplicate** | `engine/duplicate.rs` | SHA-256 content hashing to detect identical files |
@@ -88,6 +93,7 @@ flowchart LR
 | 🔐 **Secrets** | `engine/secrets.rs` | Credential leak detection (AWS, GitHub, Google, JWT, etc.) with entropy analysis |
 | 📊 **Git** | `engine/git.rs` | Git log churn analysis, contributor extraction |
 | ⚙️ **Config** | `engine/config.rs` | `.analyzer.json` custom rules parser |
+| 📦 **Assets** | `engine/assets.rs` | Metadata parsing (PNG/JPEG), duplicate matching, relations map, and orphan detection |
 
 ### ⚛️ React Frontend (`src/`)
 
@@ -99,6 +105,7 @@ flowchart LR
 | 🔐 **Insights** | `components/Insights.tsx` | Secrets alerts + searchable annotation browser |
 | 🔥 **Git** | `components/Git.tsx` | Churn hotspots, contributor breakdown |
 | 📁 **Files** | `components/Files.tsx` | File tree + squarified treemap |
+| 📦 **Assets** | `components/Assets.tsx` | Category dashboard, search/filters, duplicate assets list, relations network list, optimization panel |
 | 🕸️ **Graph** | `components/Graph.tsx` | Circular dependency coupling graph |
 | 📄 **Export** | `components/Export.tsx` | Multi-format report generator |
 
@@ -115,6 +122,7 @@ graph TD
     Shell --> Insights["Insights.tsx"]
     Shell --> Git["Git.tsx"]
     Shell --> Files["Files.tsx"]
+    Shell --> Assets["Assets.tsx"]
     Shell --> Graph["Graph.tsx"]
     Shell --> Export["Export.tsx"]
 
@@ -157,6 +165,28 @@ classDiagram
         +bool git_available
         +Vec~FileChurn~ file_churn
         +Vec~Contributor~ top_contributors
+        +Option~AssetReport~ asset_report
+    }
+
+    class AssetReport {
+        +AssetSummary summary
+        +Vec~AssetInfo~ assets
+        +Vec~AssetDuplicate~ duplicates
+        +Vec~OrphanAsset~ orphans
+        +Vec~OptimizationHint~ optimization_hints
+        +Vec~Pair~ edges
+    }
+
+    class AssetInfo {
+        +String path
+        +String name
+        +String extension
+        +u64 size
+        +String category
+        +String subcategory
+        +String description
+        +Option~String~ sha256
+        +HashMap~String, String~ metadata
     }
 
     class RoleStats {
@@ -194,4 +224,6 @@ classDiagram
     ProjectSummary --> SecretFinding
     ProjectSummary --> FileChurn
     ProjectSummary --> Contributor
+    ProjectSummary --> AssetReport
+    AssetReport --> AssetInfo
 ```

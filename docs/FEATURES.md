@@ -127,6 +127,26 @@ Circular layout graph showing `import`/`require`/`use` coupling between files:
 
 ---
 
+## 📦 Asset Intelligence
+
+Extends scan analysis beyond traditional source files to recognize multimedia, 3D, and CAD files.
+
+### 🔍 Categorization & Discovery
+
+Locsight detects and maps non-code assets into three core areas:
+- **Multimedia** — Images (`.png`, `.jpg`, `.webp`, `.gif`, `.svg`), Videos (`.mp4`, `.webm`, `.avi`), and Audio (`.mp3`, `.wav`, `.ogg`, `.flac`).
+- **3D & Game Dev** — Models (`.fbx`, `.obj`, `.gltf`, `.glb`), Textures (`.tga`, `.dds`), and Configs (`.meta` for Unity, `.tscn`/`.tres` for Godot, `.uasset`/`.umap` for Unreal).
+- **CAD & Drawings** — Technical files (`.dwg`, `.dxf`) and CAD Models (`.step`, `.iges`).
+
+### ⚙️ Deep Features
+
+- **Metadata Extraction** — Safe header parsing on image formats (PNG/JPEG) to resolve dimensions (`1920x1080`) and sizes without external CLI tools.
+- **Orphan Asset Scanner** — Scans the source code files and game configs in parallel to verify if each asset's filename is referenced. Identifies unreferenced files as **Orphans** to safely purge and reclaim storage.
+- **Dependency Graphs** — Extracts and displays connections between scene configs (e.g. Godot scene referencing `.png`/`.fbx` files) and CAD xref files.
+- **Optimization Advisor** — Generates warning/info recommendations for oversized pictures (PNG/JPG > 5MB) with potential WebP conversion estimates, and uncompressed sound clips (WAV > 10MB) with potential MP3 compression estimates.
+
+---
+
 ## 📄 Export
 
 Generate standalone reports:
@@ -163,7 +183,7 @@ Create a `.analyzer.json` file at your project root:
 
 ## 🌐 Language Support
 
-Locsight recognizes **250+ languages** including:
+Locsight recognizes **500+ languages** including:
 
 | Category | Languages |
 |:---|:---|

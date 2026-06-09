@@ -388,6 +388,51 @@ pub fn detect_tech_stack(root: &Path) -> Vec<TechStackItem> {
         items.push(new_item("Terraform".to_string(), "".to_string(), "DevOps".to_string()));
     }
 
+    // Unreal Engine custom check
+    let mut has_unreal = false;
+    if let Ok(entries) = fs::read_dir(root) {
+        for entry in entries.flatten() {
+            if entry.path().extension().and_then(|s| s.to_str()) == Some("uproject") {
+                has_unreal = true;
+                break;
+            }
+        }
+    }
+    if has_unreal {
+        items.push(new_item("Unreal Engine".to_string(), "".to_string(), "Game Engine".to_string()));
+    }
+
+    // CAD Drawings custom check
+    let mut has_cad = false;
+    if let Ok(entries) = fs::read_dir(root) {
+        for entry in entries.flatten() {
+            if let Some(ext) = entry.path().extension().and_then(|s| s.to_str()) {
+                let ext_lower = ext.to_lowercase();
+                if ext_lower == "dwg" || ext_lower == "dxf" || ext_lower == "step" || ext_lower == "stp" || ext_lower == "iges" || ext_lower == "igs" {
+                    has_cad = true;
+                    break;
+                }
+            }
+        }
+    }
+    if has_cad {
+        items.push(new_item("CAD Drawings".to_string(), "".to_string(), "CAD Tool".to_string()));
+    }
+
+    // Blender custom check
+    let mut has_blender = false;
+    if let Ok(entries) = fs::read_dir(root) {
+        for entry in entries.flatten() {
+            if entry.path().extension().and_then(|s| s.to_str()) == Some("blend") {
+                has_blender = true;
+                break;
+            }
+        }
+    }
+    if has_blender {
+        items.push(new_item("Blender".to_string(), "".to_string(), "3D Design".to_string()));
+    }
+
     // De-duplicate items by name
     let mut unique_items: Vec<TechStackItem> = Vec::new();
     for item in items {

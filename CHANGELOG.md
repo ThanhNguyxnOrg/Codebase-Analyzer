@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [2.0.0] — 2026-06-09
+
+### 🚀 Asset Intelligence Engine & Customization: v2.0.0
+
+This major release introduces the **Asset Intelligence Engine (v2.0.0)**, expanding Locsight's codebase analysis to non-code assets (multimedia, 3D/game engines, CAD drawing files, documents, fonts, archives, and databases). It also integrates Game Engines and CAD tools into the Locsight Tech Stack detection system, adds GDScript support, modularizes the unit test suite, and adds **Dashboard & Export View Toggles** to customize report visualization.
+
+#### 🎨 Dashboard & Export Customization
+- **Dashboard View Toggles**: Added a premium-styled Toolbar to turn on/off specific report sections (*Code Analysis*, *Multimedia*, *Game & 3D*, *CAD Drawings*, and *Documents*).
+- **Global Settings Synchronization**: Embedded visibility settings inside the global application context, syncing switches between Dashboard View Toolbar and Export Dialog Checkboxes.
+- **LocalStorage Persistence**: Auto-saves customize state to local storage, keeping user choices persistent across reloads.
+- **Dedicated Asset Panels**: Renders clean, standalone statistic cards on the Dashboard representing file counts, size summaries, and hints for each enabled category.
+
+#### 📦 Asset Intelligence Engine
+- **Non-code Asset Discovery**: Scans, lists, and classifies all non-code assets in parallel using Rayon.
+- **Deep Metadata Parsing**: Automatically parses PNG and JPEG byte headers to extract image dimensions.
+- **Dependency Relations & Graph**: Identifies references between assets (e.g. textures in Godot `.tscn` scenes or AutoCAD DXF Xrefs) to build an interactive relations tree.
+- **Orphan Asset Scan**: Detects unused/unreferenced files in the codebase (excluding assets cross-referenced by other assets).
+- **Optimization Suggestions**: Detects oversized images (>5MB) and uncompressed audio (>10MB WAV) and provides size savings estimations.
+
+#### ⚙️ Game Engine & CAD Tech Stack Detections
+- **Unity**: Detected via `ProjectSettings/ProjectVersion.txt` at the project root.
+- **Godot**: Detected via `project.godot` at the project root.
+- **Unreal Engine**: Detected via any `.uproject` file found at the project root.
+- **CAD Drawings**: Detected via `.dwg`, `.dxf`, `.step`, `.stp`, `.iges`, or `.igs` files found at the project root.
+- **Blender**: Detected via `.blend` files found at the project root.
+- **Icon Mappings**: Configured dedicated icons for game engines and design tools on the dashboard.
+
+#### 📁 GDScript Support
+- **Godot Scripting**: Added support for `.gd` (GDScript) files in the language registry with line/comment counting.
+
+#### 🧪 Test Separation & Automated README
+- **Separated Test Suite**: Split the monolithic asset test into dedicated files: `asset_multimedia_tests.rs`, `asset_game_tests.rs`, `asset_cad_tests.rs`, `asset_other_tests.rs`, and `techstack_game_cad_tests.rs`.
+- **Dynamic README stats**: Implemented automatic placeholders in `README.md` that are dynamically updated with the exact language count (currently 547) during compilation.
+
+---
+
 ## [1.2.0] — 2026-06-09
 
 ### 🚀 500+ Languages, 1000+ Tech Stack & Data-Driven Architecture: v1.2.0

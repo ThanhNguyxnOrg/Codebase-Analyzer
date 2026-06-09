@@ -20,7 +20,27 @@ interface AnalysisContextType {
   recentProjects: RecentProject[];
   scanFolder: (path: string) => Promise<void>;
   selectFolderAndScan: () => Promise<void>;
-  exportSummaryReport: (filePath: string, format: string) => Promise<void>;
+  exportSummaryReport: (
+    filePath: string,
+    format: string,
+    options: {
+      includeCode: boolean;
+      includeMultimedia: boolean;
+      includeGame: boolean;
+      includeCad: boolean;
+      includeDocuments: boolean;
+    }
+  ) => Promise<void>;
+  includeCode: boolean;
+  includeMultimedia: boolean;
+  includeGame: boolean;
+  includeCad: boolean;
+  includeDocuments: boolean;
+  updateIncludeCode: (val: boolean) => void;
+  updateIncludeMultimedia: (val: boolean) => void;
+  updateIncludeGame: (val: boolean) => void;
+  updateIncludeCad: (val: boolean) => void;
+  updateIncludeDocuments: (val: boolean) => void;
   resetAnalysis: () => void;
   pendingFolder: string | null;
   pendingLocignore: string;
@@ -41,6 +61,49 @@ export function AnalysisProvider({ children }: { children: React.ReactNode }) {
   const [cocomoRate, setCocomoRate] = useState<number>(2400); // Default multiplier ($2,400)
   const [cocomo, setCocomo] = useState<CocomoResult | null>(null);
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
+
+  // Global visibility/export settings
+  const [includeCode, setIncludeCode] = useState<boolean>(() => {
+    const saved = localStorage.getItem("locsight_dash_show_code");
+    return saved !== null ? saved === "true" : true;
+  });
+  const [includeMultimedia, setIncludeMultimedia] = useState<boolean>(() => {
+    const saved = localStorage.getItem("locsight_dash_show_multimedia");
+    return saved !== null ? saved === "true" : true;
+  });
+  const [includeGame, setIncludeGame] = useState<boolean>(() => {
+    const saved = localStorage.getItem("locsight_dash_show_game");
+    return saved !== null ? saved === "true" : true;
+  });
+  const [includeCad, setIncludeCad] = useState<boolean>(() => {
+    const saved = localStorage.getItem("locsight_dash_show_cad");
+    return saved !== null ? saved === "true" : true;
+  });
+  const [includeDocuments, setIncludeDocuments] = useState<boolean>(() => {
+    const saved = localStorage.getItem("locsight_dash_show_documents");
+    return saved !== null ? saved === "true" : true;
+  });
+
+  const updateIncludeCode = (val: boolean) => {
+    setIncludeCode(val);
+    localStorage.setItem("locsight_dash_show_code", String(val));
+  };
+  const updateIncludeMultimedia = (val: boolean) => {
+    setIncludeMultimedia(val);
+    localStorage.setItem("locsight_dash_show_multimedia", String(val));
+  };
+  const updateIncludeGame = (val: boolean) => {
+    setIncludeGame(val);
+    localStorage.setItem("locsight_dash_show_game", String(val));
+  };
+  const updateIncludeCad = (val: boolean) => {
+    setIncludeCad(val);
+    localStorage.setItem("locsight_dash_show_cad", String(val));
+  };
+  const updateIncludeDocuments = (val: boolean) => {
+    setIncludeDocuments(val);
+    localStorage.setItem("locsight_dash_show_documents", String(val));
+  };
   
   // Pending scan config states
   const [pendingFolder, setPendingFolder] = useState<string | null>(null);
@@ -175,12 +238,23 @@ export function AnalysisProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Export report via Rust file writer
-  const exportSummaryReport = async (filePath: string, format: string) => {
+  const exportSummaryReport = async (
+    filePath: string,
+    format: string,
+    options: {
+      includeCode: boolean;
+      includeMultimedia: boolean;
+      includeGame: boolean;
+      includeCad: boolean;
+      includeDocuments: boolean;
+    }
+  ) => {
     if (!summary) throw new Error("No scan data available to export.");
     await invoke("export_report", {
       path: filePath,
       format,
       summary,
+      options,
     });
   };
 
@@ -205,6 +279,16 @@ export function AnalysisProvider({ children }: { children: React.ReactNode }) {
         selectFolderAndScan,
         exportSummaryReport,
         resetAnalysis,
+        includeCode,
+        includeMultimedia,
+        includeGame,
+        includeCad,
+        includeDocuments,
+        updateIncludeCode,
+        updateIncludeMultimedia,
+        updateIncludeGame,
+        updateIncludeCad,
+        updateIncludeDocuments,
         pendingFolder,
         pendingLocignore,
         setPendingLocignore,

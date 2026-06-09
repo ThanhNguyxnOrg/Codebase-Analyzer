@@ -9,3 +9,4 @@ pub mod secrets;
 pub mod git;
 pub mod config;
 pub mod techstack;
+pub mod assets;

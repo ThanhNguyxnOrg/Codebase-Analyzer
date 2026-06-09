@@ -10,16 +10,16 @@
 
 <p align="center">
   <a href="https://github.com/ThanhNguyxnOrg/Locsight/releases"><img src="https://img.shields.io/github/v/release/ThanhNguyxnOrg/Locsight?style=flat-square&color=f59e0b&label=release" alt="Release" /></a>
-  <a href="https://github.com/ThanhNguyxnOrg/Locsight/actions"><img src="https://img.shields.io/github/actions/workflow/status/ThanhNguyxnOrg/Locsight/auto-merge-dependabot.yml?style=flat-square&label=CI" alt="CI" /></a>
+  <a href="https://github.com/ThanhNguyxnOrg/Locsight/actions"><img src="https://img.shields.io/github/actions/workflow/status/ThanhNguyxnOrg/Locsight/ci.yml?style=flat-square&label=CI" alt="CI" /></a>
   <a href="https://github.com/ThanhNguyxnOrg/Locsight/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ThanhNguyxnOrg/Locsight?style=flat-square&color=blue" alt="License" /></a>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-grey?style=flat-square" alt="Platform" />
-  <img src="https://img.shields.io/badge/languages-250%2B-brightgreen?style=flat-square" alt="Languages" />
+  <!-- STAT_LANGS_BADGE --><img src="https://img.shields.io/badge/languages-546%2B-brightgreen?style=flat-square" alt="Languages" /><!-- /STAT_LANGS_BADGE -->
   <img src="https://img.shields.io/badge/built_with-Rust%20%2B%20Tauri%20v2-dea584?style=flat-square" alt="Built With" />
 </p>
 
 ---
 
-A blazing-fast ⚡ desktop app that scans, visualizes, and grades your codebase in seconds. Built with **Rust** and **Tauri v2** for native speed. Supports **250+ programming languages**.
+A blazing-fast ⚡ desktop app that scans, visualizes, and grades your codebase in seconds. Built with **Rust** and **Tauri v2** for native speed. Supports **<!-- STAT_LANGS_COUNT -->546+<!-- /STAT_LANGS_COUNT --> programming languages**.
 
 ## ✨ Highlights
 
@@ -27,12 +27,14 @@ A blazing-fast ⚡ desktop app that scans, visualizes, and grades your codebase 
 |:---|:---|
 | 📊 **Dashboard** | LOC, language distribution, complexity histograms, COCOMO cost estimation |
 | 🫀 **Health Score** | DRYness, comment density, semantic role breakdown with letter grading (A+ → F) |
+| 📦 **Asset Intelligence** | Scans, classifies, and estimates savings for Multimedia (image/video/audio), 3D/Game assets, and CAD drawing dependencies |
 | 🔐 **Secrets Scanner** | Detects exposed AWS keys, GitHub tokens, JWT, private keys — auto-masked |
 | 📝 **Annotations** | Searchable TODO / FIXME / HACK / BUG tracker with filters |
+| 💡 **Insights** | Analyzes code issues, security bugs, and refactoring recommendations |
 | 🔥 **Git Hotspots** | Finds high-risk files where complexity × churn is dangerous |
 | 🌳 **Treemap** | Interactive squarified treemap sized by LOC |
 | 🕸️ **Dep Graph** | Circular module coupling graph with zoom, search, and filters |
-| 📁 **250+ Languages** | From Rust to COBOL, Solidity to GDScript — with shebang detection |
+| 📁 **<!-- STAT_LANGS_COUNT -->546+<!-- /STAT_LANGS_COUNT --> Languages** | From Rust to COBOL, Solidity to GDScript — with shebang detection |
 | 📄 **Export** | JSON · CSV · Markdown · HTML reports |
 
 ## 🚀 Quick Start

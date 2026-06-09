@@ -1,0 +1,342 @@
+# Asset Intelligence Engine Registry Configuration
+
+# Image
+[PNG]
+extensions = ["png"]
+category = "multimedia"
+subcategory = "image"
+description = "Portable Network Graphics"
+
+[JPEG]
+extensions = ["jpg", "jpeg"]
+category = "multimedia"
+subcategory = "image"
+description = "Joint Photographic Experts Group"
+
+[GIF]
+extensions = ["gif"]
+category = "multimedia"
+subcategory = "image"
+description = "Graphics Interchange Format"
+
+[WebP]
+extensions = ["webp"]
+category = "multimedia"
+subcategory = "image"
+description = "WebP Image Format"
+
+[SVG]
+extensions = ["svg"]
+category = "multimedia"
+subcategory = "image"
+description = "Scalable Vector Graphics"
+
+[BMP]
+extensions = ["bmp"]
+category = "multimedia"
+subcategory = "image"
+description = "Bitmap Image File"
+
+[ICO]
+extensions = ["ico"]
+category = "multimedia"
+subcategory = "image"
+description = "Icon File"
+
+[PSD]
+extensions = ["psd"]
+category = "multimedia"
+subcategory = "image"
+description = "Adobe Photoshop Document"
+
+[TIFF]
+extensions = ["tiff", "tif"]
+category = "multimedia"
+subcategory = "image"
+description = "Tagged Image File Format"
+
+[AI]
+extensions = ["ai"]
+category = "multimedia"
+subcategory = "image"
+description = "Adobe Illustrator Artwork"
+
+[HEIC]
+extensions = ["heic", "heif"]
+category = "multimedia"
+subcategory = "image"
+description = "High Efficiency Image File"
+
+# Video
+[MP4]
+extensions = ["mp4", "m4v"]
+category = "multimedia"
+subcategory = "video"
+description = "MPEG-4 Video"
+
+[MOV]
+extensions = ["mov"]
+category = "multimedia"
+subcategory = "video"
+description = "QuickTime Movie"
+
+[AVI]
+extensions = ["avi"]
+category = "multimedia"
+subcategory = "video"
+description = "Audio Video Interleave"
+
+[MKV]
+extensions = ["mkv"]
+category = "multimedia"
+subcategory = "video"
+description = "Matroska Video"
+
+[WebM]
+extensions = ["webm"]
+category = "multimedia"
+subcategory = "video"
+description = "WebM Video"
+
+[FLV]
+extensions = ["flv"]
+category = "multimedia"
+subcategory = "video"
+description = "Flash Video"
+
+# Audio
+[MP3]
+extensions = ["mp3"]
+category = "multimedia"
+subcategory = "audio"
+description = "MPEG-1 Audio Layer III"
+
+[WAV]
+extensions = ["wav"]
+category = "multimedia"
+subcategory = "audio"
+description = "Waveform Audio File"
+
+[OGG]
+extensions = ["ogg", "ogv", "oga"]
+category = "multimedia"
+subcategory = "audio"
+description = "Ogg Vorbis/Theora"
+
+[FLAC]
+extensions = ["flac"]
+category = "multimedia"
+subcategory = "audio"
+description = "Free Lossless Audio Codec"
+
+[AAC]
+extensions = ["aac"]
+category = "multimedia"
+subcategory = "audio"
+description = "Advanced Audio Coding"
+
+[M4A]
+extensions = ["m4a"]
+category = "multimedia"
+subcategory = "audio"
+description = "MPEG-4 Audio"
+
+# Font
+[TTF]
+extensions = ["ttf"]
+category = "font"
+subcategory = "typography"
+description = "TrueType Font"
+
+[OTF]
+extensions = ["otf"]
+category = "font"
+subcategory = "typography"
+description = "OpenType Font"
+
+[WOFF]
+extensions = ["woff"]
+category = "font"
+subcategory = "typography"
+description = "Web Open Font Format"
+
+[WOFF2]
+extensions = ["woff2"]
+category = "font"
+subcategory = "typography"
+description = "Web Open Font Format 2.0"
+
+# Model 3D
+[FBX]
+extensions = ["fbx"]
+category = "game_3d"
+subcategory = "model"
+description = "Filmbox 3D Model"
+
+[OBJ]
+extensions = ["obj"]
+category = "game_3d"
+subcategory = "model"
+description = "Wavefront OBJ 3D Model"
+
+[GLTF]
+extensions = ["gltf", "glb"]
+category = "game_3d"
+subcategory = "model"
+description = "GL Transmission Format"
+
+[BLEND]
+extensions = ["blend"]
+category = "game_3d"
+subcategory = "model"
+description = "Blender Project File"
+
+[STL]
+extensions = ["stl"]
+category = "game_3d"
+subcategory = "model"
+description = "Stereolithography Model"
+
+[COLLADA]
+extensions = ["dae"]
+category = "game_3d"
+subcategory = "model"
+description = "COLLADA Model"
+
+# Texture
+[TGA]
+extensions = ["tga"]
+category = "game_3d"
+subcategory = "texture"
+description = "Truevision TGA Texture"
+
+[DDS]
+extensions = ["dds"]
+category = "game_3d"
+subcategory = "texture"
+description = "DirectDraw Surface Texture"
+
+# Game Engine Configs
+[UnityMeta]
+extensions = ["meta", "prefab", "unity", "asset"]
+category = "game_3d"
+subcategory = "config"
+description = "Unity Meta/Prefab/Scene File"
+
+[UnrealAsset]
+extensions = ["uasset", "umap", "uproject"]
+category = "game_3d"
+subcategory = "config"
+description = "Unreal Engine Project/Asset File"
+
+[GodotResource]
+extensions = ["tscn", "tres", "gdns", "gdnlib", "import"]
+category = "game_3d"
+subcategory = "config"
+description = "Godot Project/Scene/Import File"
+
+# CAD Drawings
+[DXF]
+extensions = ["dxf"]
+category = "cad_drawing"
+subcategory = "drawing"
+description = "Drawing Exchange Format"
+
+[DWG]
+extensions = ["dwg"]
+category = "cad_drawing"
+subcategory = "drawing"
+description = "AutoCAD Drawing"
+
+[STEP]
+extensions = ["step", "stp"]
+category = "cad_drawing"
+subcategory = "drawing"
+description = "STEP CAD Model"
+
+[IGES]
+extensions = ["iges", "igs"]
+category = "cad_drawing"
+subcategory = "drawing"
+description = "IGES CAD Model"
+
+# Documents
+[TXT]
+extensions = ["txt", "text"]
+category = "document"
+subcategory = "office"
+description = "Plain Text File"
+
+[MD]
+extensions = ["md", "markdown"]
+category = "document"
+subcategory = "office"
+description = "Markdown Documentation"
+
+[PDF]
+extensions = ["pdf"]
+category = "document"
+subcategory = "office"
+description = "Portable Document Format"
+
+[DOCX]
+extensions = ["docx", "doc"]
+category = "document"
+subcategory = "office"
+description = "Microsoft Word Document"
+
+[XLSX]
+extensions = ["xlsx", "xls"]
+category = "document"
+subcategory = "office"
+description = "Microsoft Excel Spreadsheet"
+
+[PPTX]
+extensions = ["pptx", "ppt"]
+category = "document"
+subcategory = "office"
+description = "Microsoft PowerPoint Presentation"
+
+# Archives
+[ZIP]
+extensions = ["zip"]
+category = "archive"
+subcategory = "compress"
+description = "ZIP Archive"
+
+[TAR]
+extensions = ["tar", "gz", "tgz"]
+category = "archive"
+subcategory = "compress"
+description = "Tarball Archive"
+
+[7Z]
+extensions = ["7z"]
+category = "archive"
+subcategory = "compress"
+description = "7-Zip Archive"
+
+[RAR]
+extensions = ["rar"]
+category = "archive"
+subcategory = "compress"
+description = "RAR Archive"
+
+# Data
+[SQLITE]
+extensions = ["sqlite", "db"]
+category = "data"
+subcategory = "database"
+description = "SQLite Database"
+
+[PARQUET]
+extensions = ["parquet"]
+category = "data"
+subcategory = "database"
+description = "Apache Parquet"
+
+[ARROW]
+extensions = ["arrow"]
+category = "data"
+subcategory = "database"
+description = "Apache Arrow"

@@ -5,6 +5,7 @@ use std::path::Path;
 fn main() {
     println!("cargo:rerun-if-changed=languages.toml");
     println!("cargo:rerun-if-changed=techstack.toml");
+    println!("cargo:rerun-if-changed=assets.toml");
 
     // 1. Generate languages data
     let out_dir = env::var_os("OUT_DIR").unwrap();
@@ -184,6 +185,94 @@ fn main() {
     );
     fs::write(&tech_gen_path, tech_gen_content).expect("Failed to write techstack_gen.rs");
     
-    // 3. Trigger tauri_build
+    // 3. Generate assets data
+    let assets_toml_path = Path::new("assets.toml");
+    let assets_content = fs::read_to_string(assets_toml_path)
+        .expect("Failed to read assets.toml. Please ensure it exists in src-tauri/");
+    let assets_value: toml::Value = toml::from_str(&assets_content)
+        .expect("Failed to parse assets.toml");
+    
+    let mut asset_configs = Vec::new();
+    
+    if let Some(table) = assets_value.as_table() {
+        for (name, val) in table {
+            if let Some(asset) = val.as_table() {
+                let extensions = asset.get("extensions").and_then(|v| v.as_array());
+                let category = asset.get("category").and_then(|v| v.as_str()).unwrap_or("");
+                let subcategory = asset.get("subcategory").and_then(|v| v.as_str()).unwrap_or("");
+                let description = asset.get("description").and_then(|v| v.as_str()).unwrap_or("");
+                
+                if let Some(exts) = extensions {
+                    for ext_val in exts {
+                        if let Some(ext) = ext_val.as_str() {
+                            asset_configs.push(format!(
+                                "    ({:?}, AssetConfig {{ name: {:?}, category: {:?}, subcategory: {:?}, description: {:?} }})",
+                                ext.to_lowercase(),
+                                name,
+                                category,
+                                subcategory,
+                                description
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    let assets_gen_path = Path::new(&out_dir).join("assets_gen.rs");
+    let assets_gen_content = format!(
+        "#[derive(Clone, Copy)]\n\
+         pub struct AssetConfig {{\n\
+             pub name: &'static str,\n\
+             pub category: &'static str,\n\
+             pub subcategory: &'static str,\n\
+             pub description: &'static str,\n\
+         }}\n\n\
+         pub const GENERATED_ASSET_CONFIGS: &[(&str, AssetConfig)] = &[\n{},\n];\n",
+        asset_configs.join(",\n")
+    );
+    fs::write(&assets_gen_path, assets_gen_content).expect("Failed to write assets_gen.rs");
+
+    // 5. Update README.md dynamically with language counts
+    let num_langs = lang_value.as_table().map(|t| t.len()).unwrap_or(500);
+    let readme_path = Path::new("../README.md");
+    if readme_path.exists() {
+        if let Ok(readme_content) = fs::read_to_string(readme_path) {
+            let mut updated = replace_between(
+                readme_content,
+                "<!-- STAT_LANGS_BADGE -->",
+                "<!-- /STAT_LANGS_BADGE -->",
+                &format!("<img src=\"https://img.shields.io/badge/languages-{num_langs}%2B-brightgreen?style=flat-square\" alt=\"Languages\" />")
+            );
+            updated = replace_between(
+                updated,
+                "<!-- STAT_LANGS_COUNT -->",
+                "<!-- /STAT_LANGS_COUNT -->",
+                &format!("{num_langs}+")
+            );
+            let _ = fs::write(readme_path, updated);
+        }
+    }
+
+    // 4. Trigger tauri_build
     tauri_build::build();
+}
+
+fn replace_between(content: String, start_tag: &str, end_tag: &str, replacement: &str) -> String {
+    let mut result = String::new();
+    let mut current_pos = 0;
+    while let Some(start_idx) = content[current_pos..].find(start_tag) {
+        let abs_start_idx = current_pos + start_idx;
+        if let Some(end_idx) = content[abs_start_idx + start_tag.len()..].find(end_tag) {
+            let abs_end_idx = abs_start_idx + start_tag.len() + end_idx;
+            result.push_str(&content[current_pos..abs_start_idx + start_tag.len()]);
+            result.push_str(replacement);
+            current_pos = abs_end_idx;
+        } else {
+            break;
+        }
+    }
+    result.push_str(&content[current_pos..]);
+    result
 }

@@ -963,6 +963,8 @@
 # ──────────────────────────────
 
 [file_detections]
+"ProjectSettings/ProjectVersion.txt" = { name = "Unity", category = "Game Engine" }
+"project.godot" = { name = "Godot", category = "Game Engine" }
 ".circleci/config.yml" = { name = "CircleCI", category = "DevOps" }
 ".editorconfig" = { name = "EditorConfig", category = "Library" }
 ".github/workflows" = { name = "GitHub Actions", category = "DevOps" }
@@ -1034,6 +1036,11 @@
 # ──────────────────────────────
 
 [icons]
+"unity" = "package"
+"godot" = "compass"
+"unreal engine" = "compass"
+"cad drawings" = "layers"
+"blender" = "box"
 "_" = "code"
 ".net" = "csharp"
 "@google-cloud/storage" = "go"

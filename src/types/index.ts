@@ -76,6 +76,7 @@ export interface ProjectSummary {
   fileChurn: FileChurn[];
   topContributors: Contributor[];
   techStack: TechStackItem[];
+  assetReport?: AssetReport;
 }
 
 export interface TechStackItem {
@@ -85,11 +86,59 @@ export interface TechStackItem {
   icon?: string;
 }
 
-
 export interface CocomoResult {
   effortPersonMonths: number;
   developmentTimeMonths: number;
   estimatedCostUsd: number;
   teamSize: number;
+}
+
+export interface AssetInfo {
+  path: string;
+  name: string;
+  extension: string;
+  size: number;
+  category: string;
+  subcategory: string;
+  description: string;
+  sha256?: string;
+}
+
+export interface AssetSummary {
+  totalFiles: number;
+  totalSize: number;
+  categoryCounts: Record<string, number>;
+  categorySizes: Record<string, number>;
+  subcategoryCounts: Record<string, number>;
+}
+
+export interface AssetDuplicate {
+  sha256: string;
+  size: number;
+  files: string[];
+}
+
+export interface OrphanAsset {
+  path: string;
+  name: string;
+  category: string;
+  size: number;
+}
+
+export interface OptimizationHint {
+  path: string;
+  name: string;
+  message: string;
+  severity: 'info' | 'warning' | 'critical';
+  potentialSavings: number;
+}
+
+export interface AssetReport {
+  summary: AssetSummary;
+  assets: AssetInfo[];
+  duplicates: AssetDuplicate[];
+  orphans: OrphanAsset[];
+  optimizationHints: OptimizationHint[];
+  edges: [string, string][];
 }
 
