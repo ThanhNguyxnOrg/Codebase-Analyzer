@@ -23,3 +23,6 @@ dist-ssr
 *.swp
 *.swo
 *.swn
+
+# Do not ignore any test fixtures
+!src-tauri/tests/fixtures/**
